@@ -2,7 +2,7 @@
 setlocal EnableDelayedExpansion
 
 FOR /F %%I IN ("%0") DO SET BATDIR=%%~dpI
-CD /D %BATDIR%
+CD /D %BATDIR%/DB Prep
 echo %BATDIR%
 Set /p Server= Enter Server name e.g \sqlexpress : || Set Server=.\SQLExpress 
 Set /p Username= Enter username with permission to create/drop db || Set Username=sa
