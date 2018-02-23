@@ -1,0 +1,481 @@
+﻿<Window x:Class="Four2One.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Four2One"
+        xmlns:gif="http://wpfanimatedgif.codeplex.com"
+        mc:Ignorable="d"
+        Title="Four2One" Height="500" Width="800" WindowStartupLocation="CenterScreen" Icon="Resources/421_transparent_icon.ico"
+        x:Name="WinMain"
+        Loaded="WinMain_Loaded">
+    
+    <Grid> 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="4*"/>            
+        </Grid.ColumnDefinitions>
+        <ScrollViewer  VerticalScrollBarVisibility="Auto">
+        <StackPanel Grid.Column="0" Margin="10 10 10 10">
+            
+            <TextBlock 
+                Text="Connection Parameters" 
+                FontSize="14"                 
+                FontWeight="SemiBold"
+                Foreground="#00BFA5"
+                TextDecorations="Underline"
+                HorizontalAlignment="Center"/>
+            <TextBlock 
+                Text="Server*" 
+                Margin="0 10 0 0"
+                
+               />
+            <Border Grid.Column="0" 
+                    BorderThickness="1 1 1 1"
+                    BorderBrush="Gray"
+                    VerticalAlignment="Center"
+                    CornerRadius="2,2,2,2"
+                    x:Name="BServer"
+                        >
+                <Grid >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox BorderThickness="0" 
+                             Grid.Column="0" 
+                             Padding="2"
+                             Margin="2"
+                             Name="txtSQLServer"/>
+                    <Grid Grid.Column="1" Background="LightGray">
+                    <Image                          
+                           Stretch="Uniform"
+                           MaxHeight="16"
+                           MaxWidth="16" 
+                        x:Name="imgServer"
+                                
+                       />
+                    </Grid>
+                </Grid>
+            </Border>
+            <TextBlock 
+                Text="Username*" 
+                Margin="0 10 0 0"
+                
+               />
+            <Border Grid.Column="0" 
+                    BorderThickness="1 1 1 1"
+                    BorderBrush="Gray"
+                    VerticalAlignment="Center"
+                    CornerRadius="2,2,2,2"
+                    x:Name="BUserName"
+                        >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox BorderThickness="0" 
+                             Grid.Column="0" 
+                             Padding="2"
+                             Margin="2"
+                             Name="txtUserName"/>
+                    <Grid Grid.Column="1" 
+                          Background="LightGray">
+                        <Image
+                            x:Name="imgUserName"
+                                   Stretch="Uniform"
+                                   MaxHeight="16"
+                                   MaxWidth="16"                               
+                           />
+                    </Grid>
+                </Grid>
+            </Border>
+            <TextBlock 
+                Text="Password*" 
+                Margin="0 10 0 0"
+                
+              />
+
+
+            <Border Grid.Column="0" 
+                    BorderThickness="1 1 1 1"
+                    BorderBrush="Gray"
+                    VerticalAlignment="Center"
+                    CornerRadius="2,2,2,2"
+                    x:Name="BPassword"
+                        >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="9*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <PasswordBox BorderThickness="0" 
+                                     Grid.Column="0" 
+                                     Padding="2"
+                                     Margin="2"
+                                     Name="txtPassword"
+                                     LostFocus="txtPassword_LostFocus"></PasswordBox>
+                    <Grid Grid.Column="1" 
+                          Background="LightGray">
+                        <Image
+                            x:Name="imgPassword"                               
+                               Stretch="Uniform"
+                               MaxHeight="16"
+                               MaxWidth="16"                               
+                       />
+                    </Grid>
+                </Grid>  
+            </Border>
+            
+            <TextBlock 
+                Text="IQCare Database*" 
+                Margin="0 10 0 0"
+                
+               />
+            <Border Grid.Column="0" 
+                    BorderThickness="1 1 1 1"
+                    BorderBrush="Gray"
+                    VerticalAlignment="Center"
+                    CornerRadius="2,2,2,2"
+                    x:Name="BIQCareDB"
+                        >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox
+                        BorderThickness="0" 
+                        Grid.Column="0"
+                        Padding="4"
+                        Name="cBDatabase"                         
+                        DropDownOpened="cBDatabase_DropDownOpened" 
+                        DropDownClosed="cBDatabase_DropDownClosed" GotFocus="cBDatabase_GotFocus"                        
+                              >
+                       
+                    </ComboBox>
+                    <Image 
+                        Grid.Column="1"
+                        x:Name="imgIQCareDB"
+                              
+                               Stretch="Uniform"
+                               MaxHeight="16"
+                               MaxWidth="16"                               
+                       />
+                </Grid>
+            </Border>
+            <TextBlock 
+                Text="County*" 
+                Margin="0 10 0 0"
+                
+               />
+          
+            <Border Grid.Column="0" 
+                    BorderThickness="1 1 1 1"
+                    BorderBrush="Gray"
+                    VerticalAlignment="Center"
+                    CornerRadius="2,2,2,2"
+                    x:Name="BCounty"
+                        >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox SelectedIndex="0" 
+                              BorderThickness="0" 
+                             Grid.Column="0"
+                              Padding="4"
+                              x:Name="CBCounty"
+                              >
+                        <ComboBoxItem>NAIROBI</ComboBoxItem>
+                        <ComboBoxItem>MOMBASA</ComboBoxItem>
+                        <ComboBoxItem>KIAMBU</ComboBoxItem>
+                    </ComboBox>
+                    <Image Grid.Column="1"                              
+                               Stretch="Uniform"
+                               MaxHeight="16"
+                               MaxWidth="16" 
+                           x:Name="imgCounty"
+                       />
+                </Grid>
+            </Border>
+            <TextBlock 
+                Text="MFL Code*" 
+                Margin="0 10 0 0"
+                
+               />
+            <Border Grid.Column="0" 
+                    BorderThickness="1 1 1 1"
+                    BorderBrush="Gray"
+                    VerticalAlignment="Center"
+                    CornerRadius="2,2,2,2"
+                    x:Name="BMFLCode"
+                        >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="8*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox BorderThickness="0" 
+                             Grid.Column="0" 
+                             Padding="2"
+                             Margin="2"
+                             x:Name="txtMFLCode"/>
+                    <Grid Grid.Column="1"
+                          Background="LightGray">
+                    <Image 
+                        x:Name="imgMFLCode"
+                               
+                               Stretch="Uniform"
+                               MaxHeight="16"
+                               MaxWidth="16"                               
+                       />
+                    </Grid>
+                </Grid>
+            </Border>
+            
+            <Border Grid.Column="0" 
+                    BorderThickness="1 1 1 1"
+                    BorderBrush="Gray"
+                    VerticalAlignment="Center"
+                    CornerRadius="2,2,2,2"
+                    Margin="0,20,0,0"
+                        >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button BorderThickness="0" 
+                            Grid.Column="0" 
+                            Content="Save"
+                            Padding="4"
+                            Name="btnSave" 
+                            Click="btnSave_Click"
+                             />
+                    <Image Grid.Column="1"
+                           x:Name="imgSave"
+                             
+                               Stretch="Uniform"
+                               MaxHeight="16"
+                               MaxWidth="16"                               
+                       />
+                </Grid>
+            </Border>
+            <TextBlock
+                Text="Not Ready"
+                FontSize="12"
+                x:Name="txtReady"
+                TextWrapping="Wrap"
+                Margin="0, 10, 0, 0"/>
+            </StackPanel>
+        </ScrollViewer>
+            <StackPanel Grid.Column="1" Margin="10,10,10,10">
+            <TextBlock 
+                Text="Migration" 
+                FontSize="14"                 
+                FontWeight="SemiBold"
+                Foreground="#00BFA5"
+                TextDecorations="Underline"
+                HorizontalAlignment="Center"/>
+            
+            <Border Grid.Column="0" 
+                    BorderThickness="1 1 1 1"
+                    BorderBrush="Gray"
+                    VerticalAlignment="Center"
+                    CornerRadius="2,2,2,2"
+                    Margin="0,26,0,0"
+                        >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button BorderThickness="0" 
+                            Grid.Column="0" 
+                            Content="Start"
+                            Padding="4"
+                            Name="btnGo" 
+                            Click="btnGo_Click"
+                            IsEnabled="False"
+                             />
+                    <Image Grid.Column="1"
+                           x:Name="imgGo"
+                           Source="Resources\ic-warning.png"  
+                               Stretch="Uniform"
+                               MaxHeight="16"
+                               MaxWidth="16"                               
+                       />
+                </Grid>
+            </Border>
+
+            
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock 
+                            Grid.Column="0" 
+                            Text=""                            
+                            Name="txtBackup"                             
+                            IsEnabled="False"
+                        HorizontalAlignment="Right"
+                             />                
+                    <Image Grid.Column="1"
+                           x:Name="imgBackup"                             
+                               Stretch="Uniform"
+                               MaxHeight="16"
+                               MaxWidth="16"                        
+                       />                   
+                </Grid>         
+
+            
+                <Grid Margin="0,5,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="9*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock 
+                            Grid.Column="0" 
+                            Text=""                            
+                            Name="txtTableStructure"                             
+                            IsEnabled="False"
+                        HorizontalAlignment="Right"
+                             />                    
+                    <Image Grid.Column="1"
+                           x:Name="imgTableStructure"
+                           Stretch="Uniform"
+                           MaxHeight="16"
+                           MaxWidth="16"                               
+                       />                    
+                </Grid>
+            <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="9*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                            Grid.Column="0" 
+                            Text=""                            
+                            Name="txtFunctions"                             
+                            IsEnabled="False"
+                        HorizontalAlignment="Right"
+                             />
+                <Image Grid.Column="1"
+                           x:Name="imgFunctions"
+                           Stretch="Uniform"
+                           MaxHeight="16"
+                           MaxWidth="16"                               
+                       />
+            </Grid>
+
+            <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="9*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                            Grid.Column="0" 
+                            Text=""                            
+                            Name="txtViews"                             
+                            IsEnabled="False"
+                        HorizontalAlignment="Right"
+                             />
+                <Image Grid.Column="1"
+                           x:Name="imgViews"
+                           Stretch="Uniform"
+                           MaxHeight="16"
+                           MaxWidth="16"                               
+                       />
+            </Grid>
+
+            
+
+            <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="9*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                            Grid.Column="0" 
+                            Text=""                            
+                            Name="txtSPs"                             
+                            IsEnabled="False"
+                        HorizontalAlignment="Right"
+                             />
+                <Image Grid.Column="1"
+                           x:Name="imgSPs"
+                           Stretch="Uniform"
+                           MaxHeight="16"
+                           MaxWidth="16"                               
+                       />
+            </Grid>
+
+            <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="9*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                            Grid.Column="0" 
+                            Text=""                            
+                            Name="txtData"                             
+                            IsEnabled="False"
+                        HorizontalAlignment="Right"
+                             />
+                <Image Grid.Column="1"
+                           x:Name="imgData"
+                           Stretch="Uniform"
+                           MaxHeight="16"
+                           MaxWidth="16"                               
+                       />
+            </Grid>
+
+            <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="9*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                            Grid.Column="0" 
+                            Text=""                            
+                            Name="txtReg"                             
+                            IsEnabled="False"
+                        HorizontalAlignment="Right"
+                             />
+                <Image Grid.Column="1"
+                           x:Name="imgReg"
+                           Stretch="Uniform"
+                           MaxHeight="16"
+                           MaxWidth="16"                               
+                       />
+            </Grid>
+
+
+
+
+        </StackPanel>
+        <StackPanel Grid.Column="2"
+                    Margin="0,10,0,0">
+            <TextBlock 
+                Text="Log" 
+                FontSize="14"                 
+                FontWeight="SemiBold"
+                Foreground="#00BFA5"
+                TextDecorations="Underline"
+                HorizontalAlignment="Center"/>
+            <Grid>
+                <TextBlock x:Name="txtLog"
+                           TextWrapping="Wrap">
+                    
+                </TextBlock>
+            </Grid>
+
+        </StackPanel>
+
+    </Grid>
+</Window>
