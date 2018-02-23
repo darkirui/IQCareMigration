@@ -1,18 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WpfAnimatedGif;
 using Microsoft.SqlServer.Management.Common;
 using System.Data.SqlClient;
@@ -20,9 +11,7 @@ using System.IO;
 
 namespace Four2One
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+
     public partial class MainWindow : Window
     {
         BitmapImage icWarning = new BitmapImage(new Uri("pack://application:,,,/Four2One;component/Resources/ic-warning.png"));
@@ -48,22 +37,6 @@ namespace Four2One
             string password = txtPassword.Password;
             string iqcareDB = cBDatabase.Text;
 
-            //Not Sure Why I need this. LOL
-            /**
-            string serverIP = string.Empty;
-            if (server.IndexOf("\\") != -1)
-            {
-                serverIP = server.Substring(0, server.IndexOf("\\"));
-            }
-            else
-            {
-                serverIP = server;
-            }
-            if (serverIP == ".")
-            {
-                serverIP = "localhost";
-            }
-            **/
             if (ValidateParameters())
             {
                 connectionString = CreateConnectionString(server, username, password, iqcareDB);
@@ -79,7 +52,6 @@ namespace Four2One
             else
             {
                 imgSave.Source = icWarning;
-                //MessageBox.Show("IQCare Database Must be Version 4.0", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
         }
@@ -301,13 +273,24 @@ namespace Four2One
             }
             finally
             {
-                btnSave.IsEnabled = true;
-                btnGo.IsEnabled = true;                
+                //btnSave.IsEnabled = true;
+                //btnGo.IsEnabled = true;                
             }
         }
 
         private void Hama(string connectionString, string county, string mFLCode)
         {
+
+            btnGo.Dispatcher.Invoke((Action)(() =>
+            {
+                btnGo.IsEnabled = false;
+            }));
+
+            btnSave.Dispatcher.Invoke((Action)(() =>
+            {
+                btnSave.IsEnabled = false;
+            }));
+
             ServerConnection conn = new ServerConnection() { ConnectionString = connectionString };
             
             BackupDB(connectionString);
@@ -317,6 +300,16 @@ namespace Four2One
             imgGo.Dispatcher.Invoke((Action)(() =>
             {
                 ImageBehavior.SetAnimatedSource(imgGo, faCheck);
+            }));
+
+            btnGo.Dispatcher.Invoke((Action)(() =>
+            {
+                btnGo.IsEnabled = true;
+            }));
+
+            btnSave.Dispatcher.Invoke((Action)(() =>
+            {
+                btnSave.IsEnabled = true;
             }));
 
         }
@@ -661,19 +654,28 @@ namespace Four2One
                 {
                     ImageBehavior.SetAnimatedSource(imgBackup, progressWheel);
                 }));
-                ServerConnection srvConn = new ServerConnection();
-                srvConn.ConnectionString = v;
+                ServerConnection srvConn = new ServerConnection
+                {
+                    ConnectionString = v
+                };
                 SqlConnectionStringBuilder sb = new SqlConnectionStringBuilder(v);
 
                 string dbName = sb.InitialCatalog;
-                string backupSQL = "IF EXISTS(Select name from sys.databases where name = '" + dbName + "') BEGIN " +
-                                "BACKUP DATABASE [" + dbName + "]" +
-                               "TO DISK = N'C:\\IQCareDBBackup\\" + dbName + "_MigrationBackup.bak' " +
-                               "WITH NOFORMAT, INIT,  " +
-                               "NAME = N'IQCare-Full Database Backup', " +
-                               "SKIP, NOREWIND, NOUNLOAD END";
+                string BackupPath = "C:\\IQCare Migration\\" + dbName + "_MigrationBackup.bak";
+                var newFile = new FileInfo(BackupPath);
+                newFile.Directory.Create();
+
+
+                string backupSQL =
+                    $"IF EXISTS(Select name from sys.databases where name = '{dbName}') BEGIN BACKUP DATABASE [{dbName}]TO DISK = N'{BackupPath}'WITH NOFORMAT, INIT,  NAME = N'IQCare-Full Database Backup', SKIP, NOREWIND, NOUNLOAD END";
 
                 srvConn.ExecuteNonQuery(backupSQL);
+
+                txtLog.Dispatcher.Invoke((Action)(() =>
+                {
+                    txtLog.Text += " \n INFO: Database Backed Up To " + BackupPath;
+                }));
+
                 txtBackup.Dispatcher.Invoke((Action)(() =>
                 {
                     txtBackup.Text = "Backed Up";
