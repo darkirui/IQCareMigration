@@ -8,6 +8,8 @@ using WpfAnimatedGif;
 using Microsoft.SqlServer.Management.Common;
 using System.Data.SqlClient;
 using System.IO;
+using System.Collections.Generic;
+using System.Windows.Controls;
 
 namespace Four2One
 {
@@ -24,6 +26,8 @@ namespace Four2One
         string iqcareVersion = string.Empty;
         string county = string.Empty;
         string MFLCode = string.Empty;
+
+
 
         public MainWindow()
         {
@@ -247,13 +251,76 @@ namespace Four2One
             return IQCareVersion;
         }
 
+        private class County
+        {
+            public int CountyID { get; set; }
+            public string CountyName { get; set; }
+        }
+
+        private List<County> GetCounties()
+        {
+            List<County> counties = new List<County>
+            {
+                new County{CountyID = 1, CountyName = "MOMBASA"},
+                new County{CountyID = 2, CountyName = "KWALE"},
+                new County{CountyID = 3, CountyName = "KILIFI"},
+                new County{CountyID = 4, CountyName = "TANA RIVER"},
+                new County{CountyID = 5, CountyName = "LAMU"},
+                new County{CountyID = 6, CountyName = "TAITA TAVETA"},
+                new County{CountyID = 7, CountyName = "GARISSA"},
+                new County{CountyID = 8, CountyName = "WAJIR"},
+                new County{CountyID = 9, CountyName = "MANDERA"},
+                new County{CountyID = 10, CountyName = "MARSABIT"},
+                new County{CountyID = 11, CountyName = "ISIOLO"},
+                new County{CountyID = 12, CountyName = "MERU"},
+                new County{CountyID = 13, CountyName = "THARAKA - NITHI"},
+                new County{CountyID = 14, CountyName = "EMBU"},
+                new County{CountyID = 15, CountyName = "KITUI"},
+                new County{CountyID = 16, CountyName = "MACHAKOS"},
+                new County{CountyID = 17, CountyName = "MAKUENI"},
+                new County{CountyID = 18, CountyName = "NYANDARUA"},
+                new County{CountyID = 19, CountyName = "NYERI"},
+                new County{CountyID = 20, CountyName = "KIRINYAGA"},
+                new County{CountyID = 21, CountyName = "MURANG'A"},
+                new County{CountyID = 22, CountyName = "KIAMBU"},
+                new County{CountyID = 23, CountyName = "TURKANA"},
+                new County{CountyID = 24, CountyName = "WEST POKOT"},
+                new County{CountyID = 25, CountyName = "SAMBURU"},
+                new County{CountyID = 26, CountyName = "TRANS NZOIA"},
+                new County{CountyID = 27, CountyName = "UASIN GISHU"},
+                new County{CountyID = 28, CountyName = "ELGEYO/MARAKWET"},
+                new County{CountyID = 29, CountyName = "NANDI"},
+                new County{CountyID = 30, CountyName = "BARINGO"},
+                new County{CountyID = 31, CountyName = "LAIKIPIA"},
+                new County{CountyID = 32, CountyName = "NAKURU"},
+                new County{CountyID = 33, CountyName = "NAROK"},
+                new County{CountyID = 34, CountyName = "KAJIADO"},
+                new County{CountyID = 35, CountyName = "KERICHO"},
+                new County{CountyID = 36, CountyName = "BOMET"},
+                new County{CountyID = 37, CountyName = "KAKAMEGA"},
+                new County{CountyID = 38, CountyName = "VIHIGA"},
+                new County{CountyID = 39, CountyName = "BUNGOMA"},
+                new County{CountyID = 40, CountyName = "BUSIA"},
+                new County{CountyID = 41, CountyName = "SIAYA"},
+                new County{CountyID = 42, CountyName = "KISUMU"},
+                new County{CountyID = 43, CountyName = "HOMA BAY"},
+                new County{CountyID = 44, CountyName = "MIGORI"},
+                new County{CountyID = 45, CountyName = "KISII"},
+                new County{CountyID = 46, CountyName = "NYAMIRA"},
+                new County{CountyID = 47, CountyName = "NAIROBI"}
+            };
+            return counties;
+        }
         private void WinMain_Loaded(object sender, RoutedEventArgs e)
         {
             check.Color = (Color)ColorConverter.ConvertFromString("#00BFA5");
-            warning.Color = Colors.MediumVioletRed;
+            warning.Color = Colors.MediumVioletRed;            
+
+            CBCounty.ItemsSource = GetCounties();
+            CBCounty.DisplayMemberPath = "CountyName";          
         }
 
-        private void btnGo_Click(object sender, RoutedEventArgs e)
+        private void BtnGo_Click(object sender, RoutedEventArgs e)
         {
             ImageBehavior.SetAnimatedSource(imgGo, progressWheel);
             btnSave.IsEnabled = false;
@@ -347,12 +414,10 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            txtLog.Text += " \n ERROR: " + s + " - " + ex.InnerException.Message;
-                            throw ex;
+                            LogException(ex, txtReg, imgReg);
                         }
                     }
                 }
-
                 Entity en = new Entity();
                 ClsUtility.Init_Hashtable();
                 ClsUtility.AddParameters("@CountyName", SqlDbType.VarChar, county);
@@ -361,20 +426,12 @@ namespace Four2One
                 int i = (int)en.ReturnObject(conn.ConnectionString, ClsUtility.theParams
                     , "pr_hamisha_registration", ClsUtility.ObjectEnum.ExecuteNonQuery);
 
-
-                txtReg.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtReg.Text = "Migrated Registrations";
-                }));
-                imgReg.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgReg, faCheck);
-                }));
+                LogSuccess(txtReg, imgReg, "Migrated Registrations!");
+                
             }
             catch (Exception ex)
             {
-                txtLog.Text += " \n ERROR: " + " - " + ex.InnerException.Message;
-                throw ex;
+                LogException(ex, txtReg, imgReg);
             }
         }
 
@@ -402,33 +459,15 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            txtLog.Dispatcher.Invoke((Action)(() =>
-                            {
-                                txtLog.Text += " \n ERROR: " + s + " - " + ex.InnerException.Message;
-                            }));
+                            LogException(ex, txtSPs, imgSPs);
                         }
                     }
                 }
-                txtSPs.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtSPs.Text = "Updated Stored Procedures";
-                }));
-                imgSPs.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgSPs, faCheck);
-                }));
+                LogSuccess(txtSPs, imgSPs, "Updated Stored Procedures");               
             }
             catch (Exception ex)
             {
-                txtSPs.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtSPs.Text = "Whoops";
-                }));
-                imgSPs.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgSPs, icWarning);
-                }));
-                throw ex;
+                LogException(ex, txtSPs, imgSPs);
             }
         }
 
@@ -456,33 +495,15 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            txtLog.Dispatcher.Invoke((Action)(() =>
-                            {
-                                txtLog.Text += " \n ERROR: " + s + " - " + ex.InnerException.Message;
-                            }));
+                            LogException(ex, txtFunctions, imgFunctions);
                         }
                     }
                 }
-                txtFunctions.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtFunctions.Text = "Updated Functions";
-                }));
-                imgFunctions.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgFunctions, faCheck);
-                }));
+                LogSuccess(txtFunctions, imgFunctions, "Updated Functions");                
             }
             catch (Exception ex)
             {
-                txtFunctions.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtFunctions.Text = "Whoops!";
-                }));
-                imgFunctions.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgFunctions, icWarning);
-                }));
-                throw ex;
+                LogException(ex, txtFunctions, imgFunctions);
             }
         }
 
@@ -510,30 +531,15 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            txtLog.Text += " \n ERROR: " + s + " - " + ex.InnerException.Message;
+                            LogException(ex, txtViews, imgViews);
                         }
                     }
                 }
-                txtViews.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtViews.Text = "Updated Views";
-                }));
-                imgViews.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgViews, faCheck);
-                }));
+                LogSuccess(txtViews, imgViews, "Updated Views");                
             }
             catch (Exception ex)
             {
-                txtViews.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtViews.Text = "Whoops!";
-                }));
-                imgViews.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgViews, icWarning);
-                }));
-                throw ex;
+                LogException(ex, txtViews, imgViews);
             }
         }
 
@@ -561,30 +567,15 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            txtLog.Text += " \n ERROR: " + s + " - " + ex.InnerException.Message;
+                            LogException(ex, txtData, imgData);
                         }
                     }
                 }
-                txtData.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtData.Text = "Updated System Data";
-                }));
-                imgData.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgData, faCheck);
-                }));
+                LogSuccess(txtData, imgData, "Updated System Data");                
             }
             catch (Exception ex)
             {
-                txtData.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtData.Text = "Whoops!";
-                }));
-                imgData.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgData, icWarning);
-                }));
-                throw ex;                
+                LogException(ex, txtData, imgData);
             }
         }
 
@@ -611,34 +602,16 @@ namespace Four2One
                             conn.ExecuteNonQuery(fs);
                         }
                         catch (Exception ex)
-                        {                            
-                            txtLog.Dispatcher.Invoke((Action)(() =>
-                            {
-                                txtLog.Text += " \n ERROR: " + s + " - " + ex.InnerException.Message;
-                            }));
+                        {
+                            LogException(ex, txtTableStructure, imgTableStructure);
                         }
                     }
                 }
-                txtTableStructure.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtTableStructure.Text = "Updated Table Structure";
-                }));
-                imgTableStructure.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgTableStructure, faCheck);
-                }));
+                LogSuccess(txtTableStructure, imgTableStructure, "Updated Table Structure");                
             }
             catch (Exception ex)
             {
-                txtTableStructure.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtTableStructure.Text = "Whoops!";
-                }));
-                imgTableStructure.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgTableStructure, icWarning);
-                }));
-                throw ex;
+                LogException(ex, txtTableStructure, imgTableStructure);
             }
         }
 
@@ -661,48 +634,94 @@ namespace Four2One
                 SqlConnectionStringBuilder sb = new SqlConnectionStringBuilder(v);
 
                 string dbName = sb.InitialCatalog;
-                string BackupPath = "C:\\IQCare Migration\\" + dbName + "_MigrationBackup.bak";
-                var newFile = new FileInfo(BackupPath);
+                string backupPath = "C:\\IQCare Migration\\" + dbName + "_MigrationBackup.bak";
+                var newFile = new FileInfo(backupPath);
                 newFile.Directory.Create();
 
 
                 string backupSQL =
-                    $"IF EXISTS(Select name from sys.databases where name = '{dbName}') BEGIN BACKUP DATABASE [{dbName}]TO DISK = N'{BackupPath}'WITH NOFORMAT, INIT,  NAME = N'IQCare-Full Database Backup', SKIP, NOREWIND, NOUNLOAD END";
+                    $"IF EXISTS(Select name from sys.databases where name = '{dbName}') BEGIN BACKUP DATABASE [{dbName}]TO DISK = N'{backupPath}'WITH NOFORMAT, INIT,  NAME = N'IQCare-Full Database Backup', SKIP, NOREWIND, NOUNLOAD END";
 
                 srvConn.ExecuteNonQuery(backupSQL);
 
-                txtLog.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtLog.Text += " \n INFO: Database Backed Up To " + BackupPath;
-                }));
-
-                txtBackup.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtBackup.Text = "Backed Up";
-                }));
-                imgBackup.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgBackup, faCheck);
-                }));
+                LogSuccess(txtBackup, imgBackup, "DB Backed Up to " + backupPath);
             }
             catch (Exception ex)
             {
-                txtBackup.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtBackup.Text = "Whoops!";
-                }));
-                imgBackup.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgBackup, icWarning);
-                }));
-                throw ex;
+                LogException(ex, txtBackup, imgBackup);
             }
         }
 
-
-        private void cBDatabase_GotFocus(object sender, RoutedEventArgs e)
+        private void LogSuccess(TextBlock txtAction, Image imgAction, string successsMessage)
         {
-            
+            txtLog.Dispatcher.Invoke((Action)(() =>
+            {
+                txtLog.Text += " \n INFO: " + successsMessage;
+            }));
+
+            txtAction.Dispatcher.Invoke((Action)(() =>
+            {
+                txtAction.Text += " - DONE!";
+            }));
+            imgAction.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgAction, faCheck);
+            }));
+        }
+
+        private void LogException(Exception ex, TextBlock txtAction, Image imgAction)
+        {
+
+            //Get Exception Type and Log accordingly
+            //ExecutionFailureException;
+            //SqlException;
+            //This could also fail - try catch UnknownException
+
+            try
+            {
+                if (ex.GetType().Name.ToLower() == "ExecutionFailureException".ToLower())
+                {
+                    ExecutionFailureException efEx = (ExecutionFailureException)ex;
+                    txtLog.Dispatcher.Invoke((Action)(() =>
+                    {
+                        txtLog.Text += $" \n EXEC_EXCEPTION:  - {efEx.InnerException.Message}";
+                    }));
+                    
+                }
+                else if (ex.GetType().Name.ToLower() == "SqlException".ToLower())
+                {
+                    SqlException sqlEx = (SqlException)ex;
+                    txtLog.Dispatcher.Invoke((Action)(() =>
+                    {
+                        txtLog.Text += $" \n SQL_EXCEPTION:  - {sqlEx.Message}";
+                    }));
+                }
+                else
+                {
+                    txtLog.Dispatcher.Invoke((Action)(() =>
+                    {
+                        txtLog.Text += $" \n EXEC_EXCEPTION:  - {ex.Message}";
+                    }));
+                }
+            }
+            catch (Exception unknownEx)
+            {
+                txtLog.Dispatcher.Invoke((Action)(() =>
+                {
+                    txtLog.Text += $" \n UNKNOWN_EXCEPTION:  - {unknownEx.GetType().Name} - {unknownEx.Message}";
+                }));
+            }
+            finally
+            {
+                txtAction.Dispatcher.Invoke((Action)(() =>
+                {
+                    txtAction.Text += " - ERROR!";
+                }));
+                imgAction.Dispatcher.Invoke((Action)(() =>
+                {
+                    ImageBehavior.SetAnimatedSource(imgAction, icWarning);
+                }));
+            }
         }
 
         private void txtPassword_LostFocus(object sender, RoutedEventArgs e)
@@ -732,5 +751,7 @@ namespace Four2One
             }
             finally { }
         }
+
+        
     }
 }
