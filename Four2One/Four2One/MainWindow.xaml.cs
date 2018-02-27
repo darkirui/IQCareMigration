@@ -10,6 +10,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Collections.Generic;
 using System.Windows.Controls;
+using System.Deployment.Application;
 
 namespace Four2One
 {
@@ -26,16 +27,16 @@ namespace Four2One
         string iqcareVersion = string.Empty;
         string county = string.Empty;
         string MFLCode = string.Empty;
-
-
-
+        
         public MainWindow()
         {
-            InitializeComponent();
-        }       
-
+            InitializeComponent();    
+            //GridLog.DataContext = Logs;
+        }
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
+            //Logs.Add(new Log { LogID = 1, LogType = "TEST", LogMessage = "MESSAGE" });
+
             string server = txtSQLServer.Text.Trim();
             string username = txtUserName.Text.Trim();
             string password = txtPassword.Password;
@@ -257,6 +258,8 @@ namespace Four2One
             public string CountyName { get; set; }
         }
 
+        
+
         private List<County> GetCounties()
         {
             List<County> counties = new List<County>
@@ -317,7 +320,15 @@ namespace Four2One
             warning.Color = Colors.MediumVioletRed;            
 
             CBCounty.ItemsSource = GetCounties();
-            CBCounty.DisplayMemberPath = "CountyName";          
+            CBCounty.DisplayMemberPath = "CountyName";
+            CBCounty.SelectedIndex = -1;
+
+            if (ApplicationDeployment.IsNetworkDeployed)
+                Title += " - v" + ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
+
+
+            //GridLog.ItemsSource = Logs;
+            //Console.WriteLine(Logs[0].LogID);
         }
 
         private void BtnGo_Click(object sender, RoutedEventArgs e)
@@ -414,7 +425,7 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtReg, imgReg);
+                            LogException(ex, txtReg, imgReg, s);
                         }
                     }
                 }
@@ -431,7 +442,7 @@ namespace Four2One
             }
             catch (Exception ex)
             {
-                LogException(ex, txtReg, imgReg);
+                LogException(ex, txtReg, imgReg, "pr_hamisha_registration");
             }
         }
 
@@ -459,7 +470,7 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtSPs, imgSPs);
+                            LogException(ex, txtSPs, imgSPs, s);
                         }
                     }
                 }
@@ -467,7 +478,7 @@ namespace Four2One
             }
             catch (Exception ex)
             {
-                LogException(ex, txtSPs, imgSPs);
+                LogException(ex, txtSPs, imgSPs, "SPs");
             }
         }
 
@@ -495,7 +506,7 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtFunctions, imgFunctions);
+                            LogException(ex, txtFunctions, imgFunctions, s);
                         }
                     }
                 }
@@ -503,7 +514,7 @@ namespace Four2One
             }
             catch (Exception ex)
             {
-                LogException(ex, txtFunctions, imgFunctions);
+                LogException(ex, txtFunctions, imgFunctions, "Functions");
             }
         }
 
@@ -531,7 +542,7 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtViews, imgViews);
+                            LogException(ex, txtViews, imgViews, s);
                         }
                     }
                 }
@@ -539,7 +550,7 @@ namespace Four2One
             }
             catch (Exception ex)
             {
-                LogException(ex, txtViews, imgViews);
+                LogException(ex, txtViews, imgViews, "Views");
             }
         }
 
@@ -567,7 +578,7 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtData, imgData);
+                            LogException(ex, txtData, imgData, s);
                         }
                     }
                 }
@@ -575,7 +586,7 @@ namespace Four2One
             }
             catch (Exception ex)
             {
-                LogException(ex, txtData, imgData);
+                LogException(ex, txtData, imgData, "System Data");
             }
         }
 
@@ -603,7 +614,7 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtTableStructure, imgTableStructure);
+                            LogException(ex, txtTableStructure, imgTableStructure, s);
                         }
                     }
                 }
@@ -611,7 +622,7 @@ namespace Four2One
             }
             catch (Exception ex)
             {
-                LogException(ex, txtTableStructure, imgTableStructure);
+                LogException(ex, txtTableStructure, imgTableStructure, "Table Structure");
             }
         }
 
@@ -648,7 +659,7 @@ namespace Four2One
             }
             catch (Exception ex)
             {
-                LogException(ex, txtBackup, imgBackup);
+                LogException(ex, txtBackup, imgBackup, "Backup");
             }
         }
 
@@ -669,7 +680,7 @@ namespace Four2One
             }));
         }
 
-        private void LogException(Exception ex, TextBlock txtAction, Image imgAction)
+        private void LogException(Exception ex, TextBlock txtAction, Image imgAction, string scriptName = "")
         {
 
             //Get Exception Type and Log accordingly
@@ -684,7 +695,7 @@ namespace Four2One
                     ExecutionFailureException efEx = (ExecutionFailureException)ex;
                     txtLog.Dispatcher.Invoke((Action)(() =>
                     {
-                        txtLog.Text += $" \n EXEC_EXCEPTION:  - {efEx.InnerException.Message}";
+                        txtLog.Text += $" \n EXEC_EXCEPTION: - {scriptName} - {efEx.InnerException.Message}";
                     }));
                     
                 }
@@ -693,14 +704,14 @@ namespace Four2One
                     SqlException sqlEx = (SqlException)ex;
                     txtLog.Dispatcher.Invoke((Action)(() =>
                     {
-                        txtLog.Text += $" \n SQL_EXCEPTION:  - {sqlEx.Message}";
+                        txtLog.Text += $" \n SQL_EXCEPTION: - {scriptName} - {sqlEx.Message}";
                     }));
                 }
                 else
                 {
                     txtLog.Dispatcher.Invoke((Action)(() =>
                     {
-                        txtLog.Text += $" \n EXEC_EXCEPTION:  - {ex.Message}";
+                        txtLog.Text += $" \n EXEC_EXCEPTION: - {scriptName} - {ex.Message}";
                     }));
                 }
             }
@@ -708,7 +719,7 @@ namespace Four2One
             {
                 txtLog.Dispatcher.Invoke((Action)(() =>
                 {
-                    txtLog.Text += $" \n UNKNOWN_EXCEPTION:  - {unknownEx.GetType().Name} - {unknownEx.Message}";
+                    txtLog.Text += $" \n UNKNOWN_EXCEPTION: - {scriptName} - {unknownEx.GetType().Name} - {unknownEx.Message}";
                 }));
             }
             finally
@@ -752,6 +763,30 @@ namespace Four2One
             finally { }
         }
 
-        
+        private void BtnExportLog_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string exportPath = @"C:\\IQCare Migration\\MigrationLog.txt";
+                var newFile = new FileInfo(exportPath);
+                newFile.Directory.Create();
+                if (File.Exists(exportPath))
+                {
+                    File.Delete(exportPath);
+                }
+                using (StreamWriter sw = File.CreateText(exportPath))
+                {
+                    sw.Write(txtLog.Text);
+                }
+
+                imgExportLog.Source = faCheck;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                imgExportLog.Source = icWarning;
+            }
+               
+        }
     }
 }
