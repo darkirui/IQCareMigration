@@ -72,36 +72,6 @@ Begin
 	EXEC sp_RENAME '[dbo].[dtl_PatientHivPrevCareIE].[FromDistrict2]' , 'FromDistrict', 'COLUMN'
 	End
 	GO
-----migrate the selected facility
---If not Exists (Select * From sys.columns Where Name = N'ARTTransferInFrom' And Object_ID = Object_id(N'dtl_PatientHivPrevCareIE') And system_type_id=TYPE_ID('varchar'))    
---Begin
---	ALTER TABLE [dbo].[dtl_PatientHivPrevCareIE] ADD [ARTTransferInFrom2] [varchar](200) NULL
---End
---GO
---If (not Exists (Select * From sys.columns Where Name = N'ARTTransferInFrom' 
---											   And Object_ID = Object_id(N'dtl_PatientHivPrevCareIE')
---											   And system_type_id=TYPE_ID('varchar'))
---	AND Exists (SELECT * FROM INFORMATION_SCHEMA.TABLES  WHERE TABLE_NAME = N'mst_lptf'))					
---Begin
---UPDATE [dbo].[dtl_PatientHivPrevCareIE]
---	   SET [ARTTransferInFrom2] = (SELECT [Name] FROM mst_lptf WHERE ID =  ARTTransferInFrom)
---End
---Go
---If not Exists (Select * From sys.columns Where Name = N'ARTTransferInFrom' 
---											   And Object_ID = Object_id(N'dtl_PatientHivPrevCareIE')
---											   And system_type_id=TYPE_ID('varchar'))    
---Begin
---	ALTER TABLE [dbo].[dtl_PatientHivPrevCareIE] DROP COLUMN [ARTTransferInFrom]
---	End
---	GO
-
---If Exists (Select * From sys.columns Where Name = N'ARTTransferInFrom2' 
---											   And Object_ID = Object_id(N'dtl_PatientHivPrevCareIE')
---											   And system_type_id=TYPE_ID('varchar'))    
---Begin
---	EXEC sp_RENAME '[dbo].[dtl_PatientHivPrevCareIE].[ARTTransferInFrom2]' , 'ARTTransferInFrom', 'COLUMN'
---	End
---	GO
 
 
 If Not Exists (Select * From sys.columns Where Name = N'Id' And Object_ID = Object_id(N'dtl_PatientPharmacyOrder'))    
@@ -127,12 +97,13 @@ Begin
   Alter table dbo.Dtl_StockTransaction Add Id int Not Null Identity(1,1)
 End
 Go
-/****** Object:  Index [IDX_dtl_PatientPharmacyOrder_CL1]    Script Date: 6/20/2016 1:22:38 PM ******/
+
+
 If  Exists (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[dtl_PatientPharmacyOrder]') AND name = N'IDX_dtl_PatientPharmacyOrder_CL1')   
 DROP INDEX [IDX_dtl_PatientPharmacyOrder_CL1] ON [dbo].[dtl_PatientPharmacyOrder] WITH ( ONLINE = OFF )
 GO
 
-/****** Object:  Index [IDX_dtl_PatientPharmacyOrder_CL1]    Script Date: 6/20/2016 1:22:38 PM ******/
+
 CREATE NonCLUSTERED INDEX [IDX_dtl_PatientPharmacyOrder_CL1] ON [dbo].[dtl_PatientPharmacyOrder]
 (
 	[ptn_pharmacy_pk] ASC,
@@ -222,13 +193,13 @@ Begin
   Alter table dbo.mst_Patient Add HEIIDNumber varchar(50) Null
 End
 Go
-IF Exists (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Mst_LabTest]') AND type in (N'U')) Begin
+/*IF Exists (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Mst_LabTest]') AND type in (N'U')) Begin
 	update Mst_LabTest set DeleteFlag = 0 where DeleteFlag Is Null
 	update lnk_LabValue set DeleteFlag = 0 where DeleteFlag Is Null
 	update lnk_TestParameter set DeleteFlag = 0 where DeleteFlag Is Null
 	update lnk_parameterresult set Result = nullif(result,'');
 	Delete from lnk_parameterresult where Result Is Null
-End
+End*/
 Go
  If Not Exists (Select * From sys.columns Where Name = N'PONumber' And Object_ID = object_id(N'ord_PurchaseOrder')) Begin
 	Alter Table dbo.ord_PurchaseOrder Add PONumber varchar(36) 
@@ -392,13 +363,14 @@ Begin
   Alter table dbo.ord_bill Add AmountSettled decimal(18,2) Null
 End
 Go
-Update B Set
+/*Update B Set
 		Settled = Case When P.TypeName In ('Cash', 'Waiver', 'Deposit', 'Cheque', 'Writeoff') Then 1 Else 0 End
 	,	AmountSettled = Case When P.TypeName In ('Cash', 'Waiver', 'Deposit', 'Cheque', 'Writeoff') Then AmountPayable Else 0.0 End
 From ord_bill B
 Inner Join Mst_BillPaymentType P On B.TransactionType = P.TypeID
 Where  B.Settled = 0;
-Go
+Go*/
+
 If Not Exists (Select * From sys.columns Where Name = N'Narrative' And Object_ID = Object_id(N'ord_bill'))    
 Begin
   Alter table dbo.ord_bill Add Narrative varchar(50) Null
@@ -841,7 +813,7 @@ IF Not Exists (SELECT * FROM sys.key_constraints WHERE type = 'PK' AND parent_ob
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 
 GO
-Alter table dbo.Dtl_AdjustStock Alter Column AdjustId	int	Not Null
+/*Alter table dbo.Dtl_AdjustStock Alter Column AdjustId	int	Not Null
 Go
 Alter table dbo.Dtl_AdjustStock Alter Column ItemId	int	Not Null
 Go
@@ -854,7 +826,7 @@ Go
 Alter table dbo.Dtl_AdjustStock Alter Column AdjustReasonId	int	Not Null
 Go
 Alter table dbo.Dtl_AdjustStock Alter Column AdjustmentQuantity	int	Not Null
-Go
+Go*/
 
 
 --remove Records,billing, and Wards to mst_facility for configuration	 use modules
@@ -1503,13 +1475,23 @@ GO
 		ALTER TABLE dbo.ord_Visit DROP COLUMN AuditData;
 	END
 
-	If Exists(Select * from sys.tables where Name = N'mst_Regimen')
-BEGIN
+	If NOT Exists(Select * from sys.columns where Name = N'Stage' AND Object_ID = Object_ID(N'mst_Regimen'))
+	BEGIN
 	ALTER TABLE mst_Regimen ADD Stage VARCHAR(100) NULL
+	END
+	If NOT Exists(Select * from sys.columns where Name = N'SrNo' AND Object_ID = Object_ID(N'mst_Regimen'))
+	BEGIN
 	ALTER TABLE mst_Regimen ADD SrNo VARCHAR(100) NULL
+	END
+	If NOT Exists(Select * from sys.columns where Name = N'UserID' AND Object_ID = Object_ID(N'mst_Regimen'))
+	BEGIN
 	ALTER TABLE mst_Regimen ADD UserID INT NULL
+	END
+	If NOT Exists(Select * from sys.columns where Name = N'CreateDate' AND Object_ID = Object_ID(N'mst_Regimen'))
+	BEGIN
 	ALTER TABLE mst_Regimen ADD CreateDate DATETIME NULL
-END
+	END
+
 GO
 
 IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'FamilyInfoId' AND Object_ID = OBJECT_ID(N'PersonRelationship'))

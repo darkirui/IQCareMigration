@@ -258,8 +258,6 @@ namespace Four2One
             public string CountyName { get; set; }
         }
 
-        
-
         private List<County> GetCounties()
         {
             List<County> counties = new List<County>
@@ -314,6 +312,7 @@ namespace Four2One
             };
             return counties;
         }
+
         private void WinMain_Loaded(object sender, RoutedEventArgs e)
         {
             check.Color = (Color)ColorConverter.ConvertFromString("#00BFA5");
@@ -325,10 +324,6 @@ namespace Four2One
 
             if (ApplicationDeployment.IsNetworkDeployed)
                 Title += " - v" + ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
-
-
-            //GridLog.ItemsSource = Logs;
-            //Console.WriteLine(Logs[0].LogID);
         }
 
         private void BtnGo_Click(object sender, RoutedEventArgs e)
@@ -374,6 +369,7 @@ namespace Four2One
             BackupDB(connectionString);
             DBPrep(conn);
             MigrateRegistrations(conn, county, MFLCode);
+            MigrateTreatmentSupporters(conn);
 
             imgGo.Dispatcher.Invoke((Action)(() =>
             {
@@ -626,6 +622,29 @@ namespace Four2One
             }
         }
 
+        private void MigrateTreatmentSupporters(ServerConnection conn)
+        {
+            txtTS.Dispatcher.Invoke((Action)(() =>
+            {
+                txtTS.Text = "Migrating Treatment Supporters";
+            }));
+            imgTS.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgTS, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\PatientTreatmentSupporter.sql";
+            try
+            {                
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();            
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtTS, imgTS, "Migrated Treatment Supporters");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtReg, imgReg, s);
+            }
+        }
         private void BackupDB(string v)
         {
             try
@@ -682,29 +701,33 @@ namespace Four2One
 
         private void LogException(Exception ex, TextBlock txtAction, Image imgAction, string scriptName = "")
         {
-
-            //Get Exception Type and Log accordingly
-            //ExecutionFailureException;
-            //SqlException;
-            //This could also fail - try catch UnknownException
-
             try
             {
                 if (ex.GetType().Name.ToLower() == "ExecutionFailureException".ToLower())
                 {
                     ExecutionFailureException efEx = (ExecutionFailureException)ex;
-                    txtLog.Dispatcher.Invoke((Action)(() =>
+                    if (efEx.GetBaseException().GetType().Name.ToLower() == "SqlException".ToLower())
                     {
-                        txtLog.Text += $" \n EXEC_EXCEPTION: - {scriptName} - {efEx.InnerException.Message}";
-                    }));
-                    
+                        SqlException sqlEx = (SqlException)efEx.GetBaseException();
+                        txtLog.Dispatcher.Invoke((Action)(() =>
+                        {
+                            txtLog.Text += $" \n SQL_EXCEPTION: SCRIPT_NAME = {scriptName} - LINE_NUMBER = {sqlEx.LineNumber} - MESSAGE = {sqlEx.Message}";
+                        }));
+                    }
+                    else
+                    {
+                        txtLog.Dispatcher.Invoke((Action)(() =>
+                        {
+                            txtLog.Text += $" \n EXEC_EXCEPTION: - {scriptName} - {efEx.InnerException.Message}";
+                        }));
+                    }                    
                 }
                 else if (ex.GetType().Name.ToLower() == "SqlException".ToLower())
                 {
                     SqlException sqlEx = (SqlException)ex;
                     txtLog.Dispatcher.Invoke((Action)(() =>
                     {
-                        txtLog.Text += $" \n SQL_EXCEPTION: - {scriptName} - {sqlEx.Message}";
+                        txtLog.Text += $" \n SQL_EXCEPTION: SCRIPT_NAME = {scriptName} - LINE_NUMBER = {sqlEx.LineNumber} - MESSAGE = {sqlEx.Message}";
                     }));
                 }
                 else

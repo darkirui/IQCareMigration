@@ -26,15 +26,14 @@ Delete from dtl_PatientTrackingCare Where Ptn_Pk = 0
 Delete From dtl_PatientTrackingCare Where Ptn_Pk = 0
 Go
 update Mst_ItemMaster
-set abbreviation = tbl.abbrv
+set abbreviation = SUBSTRING(tbl.abbrv,0,50)
 from Mst_ItemMaster inner join 
  (
 Select distinct ST2.drug_pk, 
-    substring(
-        (
+    substring((
             Select '/'+ST1.GenericAbbrevation  AS [text()]
             From (select c.drug_pk,d.GenericAbbrevation from mst_drug c inner join 
-(select a.drug_pk,b.genericabbrevation from lnk_druggeneric a inner join mst_generic b on a.GenericID=b.GenericID 
+			(select a.drug_pk,b.genericabbrevation from lnk_druggeneric a inner join mst_generic b on a.GenericID=b.GenericID 
 where genericabbrevation is not null and genericabbrevation <>'') d
 on c.Drug_pk = d.Drug_pk) ST1
             Where ST1.Drug_pk = ST2.Drug_pk
@@ -44,7 +43,9 @@ on c.Drug_pk = d.Drug_pk) ST1
 From (select c.drug_pk,d.GenericAbbrevation from mst_drug c inner join 
 (select a.drug_pk,b.genericabbrevation from lnk_druggeneric a inner join mst_generic b on a.GenericID=b.GenericID 
 where genericabbrevation is not null and genericabbrevation <>'') d
-on c.Drug_pk = d.Drug_pk) ST2) tbl
+on c.Drug_pk = d.Drug_pk) ST2
+
+) tbl
 on Mst_ItemMaster.item_pk = tbl.Drug_pk Where abbreviation Is Null
 Go
 update Mst_PreDefinedFields set controlid=4 where PDFName='CouncellingTopicId'

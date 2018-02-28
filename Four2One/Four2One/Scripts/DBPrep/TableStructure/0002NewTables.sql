@@ -4457,7 +4457,7 @@ IF NOT EXISTS
                                NOT NULL,
          [PersonId]      [INT] NOT NULL,
          [SupporterId]   [INT] NOT NULL,
-         [MobileContact] [VARCHAR](MAX) NULL,
+         [MobileContact] [VARBINARY](MAX) NULL,
          [DeleteFlag]    [BIT] NOT NULL,
          [CreatedBy]     [INT] NOT NULL,
          [CreateDate]    [DATETIME] NOT NULL,
