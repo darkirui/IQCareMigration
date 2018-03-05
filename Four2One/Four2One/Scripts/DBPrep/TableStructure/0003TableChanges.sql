@@ -942,18 +942,25 @@ IF Not Exists (SELECT * FROM sys.key_constraints WHERE type = 'PK' AND parent_ob
 	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 
 GO
--- drop column if it already Exists
+
+--dtl_PatientAppointment
+
+IF EXISTS (SELECT * FROM sys.key_constraints WHERE type = 'PK' 
+AND parent_object_id = OBJECT_ID('dbo.dtl_PatientAppointment') AND Name = 'PK_dtl_patient_appointments')
+ALTER TABLE [dbo].[dtl_PatientAppointment] DROP CONSTRAINT [PK_dtl_patient_appointments] WITH ( ONLINE = OFF )
+GO
+
 IF Not Exists (SELECT * FROM sys.columns WHERE Name = 'AppointmentId' AND object_id = OBJECT_ID('dbo.dtl_PatientAppointment'))
     ALTER TABLE dbo.dtl_PatientAppointment Add AppointmentId int Identity(1,1);
 GO
 
-IF Not Exists (SELECT * FROM sys.key_constraints WHERE type = 'PK' AND parent_object_id = OBJECT_ID('dbo.dtl_PatientAppointment') AND Name = 'PK_dtl_PatientAppointment')
+IF Not Exists (SELECT * FROM sys.key_constraints WHERE type = 'PK' 
+AND parent_object_id = OBJECT_ID('dbo.dtl_PatientAppointment') AND Name = 'PK_dtl_PatientAppointment')
    ALTER TABLE [dbo].[dtl_PatientAppointment] ADD  CONSTRAINT [PK_dtl_PatientAppointment] PRIMARY KEY CLUSTERED 
-	(
-	[AppointmentID] ASC
-	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
-
-GO
+	([AppointmentID] ASC)
+	WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF
+	, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF
+	, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 GO
 
 

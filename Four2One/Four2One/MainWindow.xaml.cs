@@ -390,6 +390,7 @@ namespace Four2One
 
         private void DBPrep(ServerConnection conn)
         {
+            //TODO Fail this if one fails
             UpdateTableStructure(conn);
             UpdateFunctions(conn);
             UpdateViews(conn);
@@ -711,7 +712,10 @@ namespace Four2One
                         SqlException sqlEx = (SqlException)efEx.GetBaseException();
                         txtLog.Dispatcher.Invoke((Action)(() =>
                         {
-                            txtLog.Text += $" \n SQL_EXCEPTION: SCRIPT_NAME = {scriptName} - LINE_NUMBER = {sqlEx.LineNumber} - MESSAGE = {sqlEx.Message}";
+                            txtLog.Text += $"\n SQL_EXCEPTION:";
+                            txtLog.Text += $"\n     SCRIPT_NAME = {scriptName}";
+                            txtLog.Text += $"\n     LINE_NUMBER = {sqlEx.LineNumber}";
+                            txtLog.Text += $"\n     MESSAGE = {sqlEx.Message}";
                         }));
                     }
                     else
@@ -727,7 +731,10 @@ namespace Four2One
                     SqlException sqlEx = (SqlException)ex;
                     txtLog.Dispatcher.Invoke((Action)(() =>
                     {
-                        txtLog.Text += $" \n SQL_EXCEPTION: SCRIPT_NAME = {scriptName} - LINE_NUMBER = {sqlEx.LineNumber} - MESSAGE = {sqlEx.Message}";
+                        txtLog.Text += $"\n SQL_EXCEPTION:";
+                        txtLog.Text += $"\n     SCRIPT_NAME = {scriptName}";
+                        txtLog.Text += $"\n     LINE_NUMBER = {sqlEx.LineNumber}";
+                        txtLog.Text += $"\n     MESSAGE = {sqlEx.Message}";
                     }));
                 }
                 else
