@@ -58,7 +58,7 @@ select a.Ptn_Pk
 	, @CountyID County
 	, 0 SubCounty
 	, 0 Ward
-	, COALESCE((Select Name FROM mst_Village WHERE ID = VillageName),'Unknown') Village
+	, REPLACE(COALESCE((Select Name FROM mst_Village WHERE ID = VillageName),'Unknown'),'''','''''') Village
 	, 'Unknown' [Location]
 	, 'Unknown' SubLocation
 	, 'Unknown' NearestHealthCentre
