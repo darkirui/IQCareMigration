@@ -43,6 +43,59 @@ Open symmetric key Key_CTC decryption by password='ttwbvXWpqb5WOLfLrBgisw=='
 DECLARE @C as cursor
 Set @C =  CURSOR FOR
 
+WITH RandomSources AS (
+select ptn_pk
+, CASE WHEN FirstLineRegStDate IS NULL OR YEAR(FirstLineRegStDate) = 1900 THEN NULL ELSE 
+FirstLineRegStDate END AS StartARTDate
+, CASE WHEN a.FirstLineReg = '' THEN NULL 
+       WHEN ISNUMERIC(a.FirstLineReg) = 1 THEN (SELECT RegimenName FROM mst_Regimen m WHERE m.RegimenID = a.FirstLineReg) 
+	   ELSE a.FirstLineReg END AS StartRegimen
+, NULL TransferInFrom
+, NULL MFLCode
+from dtl_PatientARTCare a 
+WHERE CASE WHEN FirstLineRegStDate IS NULL OR YEAR(FirstLineRegStDate) = 1900 THEN NULL ELSE 
+FirstLineRegStDate END IS NOT NULL
+
+UNION
+
+select Ptn_pk
+, CurrentARTStartDate StartARTDate
+, CASE WHEN CurrentART = '' THEN NULL ELSE CurrentART END StartRegimen
+, b.Name TransferInFrom
+, b.MFLCode
+from dtl_PatientHivPrevCareIE a LEFT JOIN 
+mst_LPTF b ON a.ARTTransferInFrom = b.ID
+where PrevARVExposure = 1 and YEAR(CurrentARTStartDate) > 1900
+
+UNION
+
+select ptn_pk
+, CASE WHEN YEAR(ARTStartDate) = 1900 THEN NULL ELSE ARTStartDate END AS StartARTDate 
+, NULL StartRegimen
+, NULL TransferInFrom
+, NULL MFLCode
+from dtl_PatientHivPrevCareEnrollment
+WHERE  CASE WHEN YEAR(ARTStartDate) = 1900 THEN NULL ELSE ARTStartDate END IS NOT NULL)
+
+, TransferInOnART AS (
+
+select a.Ptn_Pk PatientPK
+, b.StartARTDate
+, b.StartRegimen
+, b.TransferInFrom
+, b.MFLCode
+ from mst_Patient a INNER JOIN (
+Select a.ptn_pk 
+, MAX(CAST(StartARTDate as DATE)) StartARTDate
+, MAX(StartRegimen) StartRegimen
+, MAX(TransferInFrom) TransferInFrom
+, MAX(MFLCode) MFLCode
+FROM RandomSources a 
+GROUP BY a.ptn_pk)
+b ON a.ptn_pk = b.Ptn_Pk
+WHERE (a.DeleteFlag = 0 OR a.DeleteFlag IS NULL)
+and b.StartARTDate < a.RegistrationDate
+)
 
 select a.Ptn_Pk
 	, CAST(YEAR(regCCC.RegistrationAtCCC) AS VARCHAR(10)) + '-' + CAST(ROW_NUMBER() OVER(PARTITION BY YEAR(regCCC.RegistrationAtCCC) ORDER BY regCCC.RegistrationAtCCC) AS VARCHAR(10)) AS PatientIndex
@@ -88,7 +141,7 @@ select a.Ptn_Pk
 	WHEN EntryPoint.Name IS NULL THEN 0 --Not Documented
 	ELSE 25 --Other
 	END AS EntryPoint
-	, CASE WHEN transferin.ARTTransferInDate <= regCCC.RegistrationAtCCC Then 260 ELSE 261 END AS PatientType
+	, CASE WHEN TransferInOnART.PatientPK IS NOT NULL Then 260 ELSE 261 END AS PatientType
 	, @MFLCode + '-' + PatientEnrollmentID PatientEnrollmentID
 
 	--**MaritalStatus
@@ -138,8 +191,7 @@ select a.Ptn_Pk
 
 	left join mst_decode EntryPoint on a.ReferredFrom = EntryPoint.ID and EntryPoint.CodeID IN (17, 1089)	
 
-	left join (Select Ptn_Pk, Max(ARTTransferInDate) ARTTransferInDate 
-			From dtl_PatientHivPrevCareIE Group By Ptn_Pk) transferin on a.ptn_pk = transferin.ptn_pk
+	left join TransferInOnART on a.ptn_pk = TransferInOnART.PatientPK
 	LEFT join mst_Decode MaritalStatus on a.MaritalStatus = MaritalStatus.ID
 
 	where 
@@ -257,6 +309,7 @@ INSERT INTO [dbo].[PersonContact]
            ,NULL
            ,1 ,0 ,1 ,GETDATE() ,NULL);
 
+		   /*
 IF (YEAR(CAST('''+@HIVTestDate+''' AS DATE)) > 1980)
 INSERT INTO [dbo].[HIVReConfirmatoryTest]
            ([PersonId]
@@ -273,6 +326,7 @@ INSERT INTO [dbo].[HIVReConfirmatoryTest]
            ,1443 --TODO = Positive
            ,CAST('''+@HIVTestDate+''' AS DATE)
            ,0 ,1 ,GETDATE() ,NULL);
+		   */
 
 INSERT INTO [dbo].[PatientMaritalStatus]
            ([PersonId]

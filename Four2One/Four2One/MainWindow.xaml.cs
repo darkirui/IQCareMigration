@@ -102,7 +102,7 @@ namespace Four2One
                 imgUserName.Source = faCheck;
                 BUserName.BorderBrush = check;
             }
-            if(iqcareVersion != "4.0.0")
+            if(iqcareVersion != "4.1.0")
             {
                 imgIQCareDB.Source = icWarning;
                 BIQCareDB.BorderBrush = warning;
@@ -365,11 +365,19 @@ namespace Four2One
             }));
 
             ServerConnection conn = new ServerConnection() { ConnectionString = connectionString };
-            
-            BackupDB(connectionString);
-            DBPrep(conn);
-            MigrateRegistrations(conn, county, MFLCode);
-            MigrateTreatmentSupporters(conn);
+
+            try
+            {
+                BackupDB(connectionString);
+                DBPrep(conn);
+                MigrateRegistrations(conn, county, MFLCode);
+                MigrateTreatmentSupporters(conn);
+                MigrateHisoryAndBaseline(conn);
+            }
+            catch(Exception ex)
+            {
+                LogException(ex, txtBackup, imgBackup);
+            }
 
             imgGo.Dispatcher.Invoke((Action)(() =>
             {
@@ -390,12 +398,43 @@ namespace Four2One
 
         private void DBPrep(ServerConnection conn)
         {
-            //TODO Fail this if one fails
-            UpdateTableStructure(conn);
-            UpdateFunctions(conn);
-            UpdateViews(conn);
-            UpdateSPs(conn);
-            UpdateData(conn);
+            try
+            {
+                UpdateTableStructure(conn);
+                UpdateFunctions(conn);
+                UpdateViews(conn);
+                UpdateSPs(conn);
+                UpdateData(conn);
+            }
+            catch(Exception ex)
+            {
+                //LogException(ex, txtBackup, imgBackup);
+                throw ex;
+            }
+        }
+
+        private void MigrateHisoryAndBaseline(ServerConnection conn)
+        {
+            txtHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                txtHistory.Text = "Migrating Treatment History & Baseline";
+            }));
+            imgHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\HistoryANDBaseline.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Migrated Treatment History & Baseline Data");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
         }
 
         private void MigrateRegistrations(ServerConnection conn, string county, string mflCode)
@@ -467,7 +506,8 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtSPs, imgSPs, s);
+                            //LogException(ex, txtSPs, imgSPs, s);
+                            throw ex;
                         }
                     }
                 }
@@ -503,7 +543,8 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtFunctions, imgFunctions, s);
+                            //LogException(ex, txtFunctions, imgFunctions, s);
+                            throw ex;
                         }
                     }
                 }
@@ -539,7 +580,8 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtViews, imgViews, s);
+                            //LogException(ex, txtViews, imgViews, s);
+                            throw ex;
                         }
                     }
                 }
@@ -575,7 +617,8 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtData, imgData, s);
+                            //LogException(ex, txtData, imgData, s);
+                            throw ex;
                         }
                     }
                 }
@@ -611,7 +654,8 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtTableStructure, imgTableStructure, s);
+                            //LogException(ex, txtTableStructure, imgTableStructure, s);
+                            throw ex;
                         }
                     }
                 }
@@ -643,9 +687,10 @@ namespace Four2One
             }
             catch (Exception ex)
             {
-                LogException(ex, txtReg, imgReg, s);
+                LogException(ex, txtTS, imgTS, s);
             }
         }
+
         private void BackupDB(string v)
         {
             try

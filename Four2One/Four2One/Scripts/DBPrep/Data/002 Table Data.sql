@@ -1,9 +1,34 @@
 SET NOCOUNT ON;
 Go
--- Update version
-Update AppAdmin Set AppVer='Ver 1.0.0.3 Kenya HMIS', DBVer='Ver 1.0.0.3 Kenya HMIS', RelDate='20170801 00:00:00.000', VersionName = 'Kenya HMIS Ver 1.0.0.3'
 
+declare @maxdecodeid as int = (select max(ID)+1  from mst_Decode)
+DBCC CHECKIDENT ('mst_Decode', RESEED, @maxdecodeid); 
+GO
+
+declare @maxcodeid as int = (select max(CodeID)+1  from mst_Code)
+
+DBCC CHECKIDENT ('mst_Code', RESEED, @maxcodeid); 
+GO
+
+declare @maxvisittypeid as int = (select max(VisitTypeID)+1  from mst_VisitType)
+
+DBCC CHECKIDENT ('mst_VisitType', RESEED, @maxvisittypeid); 
+GO
+
+declare @maxmoduleid as int = (select max(moduleid)+1  from mst_module)
+
+DBCC CHECKIDENT ('mst_module', RESEED, @maxmoduleid); 
+GO
+
+
+-- Update version
+Update AppAdmin Set AppVer='Ver 1.0.0.3 Kenya HMIS'
+, DBVer='Ver 1.0.0.3 Kenya HMIS'
+, RelDate='20170801 00:00:00.000'
+, VersionName = 'Kenya HMIS Ver 1.0.0.3'
 Go
+
+
 EXECUTE sp_msforeachtable 'ALTER TABLE ? disable trigger ALL'
 Go
 --update patientfacilityId
@@ -25,6 +50,8 @@ Go
 Delete from dtl_PatientTrackingCare Where Ptn_Pk = 0
 Delete From dtl_PatientTrackingCare Where Ptn_Pk = 0
 Go
+
+
 update Mst_ItemMaster
 set abbreviation = SUBSTRING(tbl.abbrv,0,50)
 from Mst_ItemMaster inner join 
@@ -48,15 +75,14 @@ on c.Drug_pk = d.Drug_pk) ST2
 ) tbl
 on Mst_ItemMaster.item_pk = tbl.Drug_pk Where abbreviation Is Null
 Go
+
 update Mst_PreDefinedFields set controlid=4 where PDFName='CouncellingTopicId'
 Go
-/****** Object:  Index [IX_mst_Patient]    Script Date: 12/11/2014 16:22:36 ******/
+
 IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[mst_Patient]') AND name = N'IX_mst_Patient')
 DROP INDEX [IX_mst_Patient] ON [dbo].[mst_Patient] WITH ( ONLINE = OFF )
 GO
 
-
-/****** Object:  Index [IX_mst_Patient]    Scrript Date: 12/11/2014 16:22:36 ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_mst_Patient] ON [dbo].[mst_Patient] 
 (
 	[PatientFacilityID] ASC
@@ -78,6 +104,8 @@ Inner Join md On md.ModuleId = m.ModuleID
 Where RI > 1
 And M.DeleteFlag = 1
 Go
+
+
 
 ;With SU As (Select	UserId
 	,	StoreId
@@ -158,29 +186,27 @@ End
 Update mst_module Set ModuleFlag = 1 Where ModuleName In('Billing','Pharmacy','Laboratory','Ward Admission');
 Go
 
+--INSERT New Modules
+
 If Not Exists(Select 1 From mst_module where ModuleName ='Billing')
-Begin
-	
+Begin	
 	Insert into mst_module (ModuleName,DeleteFlag,UserID,CreateDate,UpdateDate,Status,UpdateFlag,Identifier,PharmacyFlag ,CanEnroll,DisplayName,ModuleFlag)
 	values ('Billing',0,1,GETDATE(),null,2,0,1,0,0,'BILLING',1)
 End
 If Not Exists(Select 1 From mst_module where ModuleName ='Pharmacy')
-Begin
-	
+Begin	
 	Insert into mst_module (ModuleName,DeleteFlag,UserID,CreateDate,UpdateDate,Status,UpdateFlag,Identifier,PharmacyFlag ,CanEnroll,DisplayName,ModuleFlag)
 	values ('Pharmacy',0,1,GETDATE(),null,2,0,1,1,0,'Pharmacy',1)
 End
 Go
 If Not Exists(Select 1 From mst_module where ModuleName ='Laboratory')
-Begin
-	
+Begin	
 	Insert into mst_module (ModuleName,DeleteFlag,UserID,CreateDate,UpdateDate,Status,UpdateFlag,Identifier,PharmacyFlag ,CanEnroll,DisplayName,ModuleFlag)
 	values ('Laboratory',0,1,GETDATE(),null,2,0,1,0,0,'Laboratory',1)
 End
 Go
 If Not Exists(Select 1 From mst_module where ModuleName ='Ward Admission')
-Begin
-	
+Begin	
 	Insert into mst_module (ModuleName,DeleteFlag,UserID,CreateDate,UpdateDate,Status,UpdateFlag,Identifier,PharmacyFlag ,CanEnroll,DisplayName,ModuleFlag)
 	values ('Ward Admission',0,1,GETDATE(),null,2,0,1,0,0,'Ward Admission',1)
 End
@@ -339,6 +365,7 @@ insert into lnk_ControlBusinessRule(ControlId,BusinessRuleId,UserId,CreateDate)
 values(7,1,1,GETDATE())
 end
 Go
+
 Update D 
 Set DeleteFlag =1 
 From Mst_Decode D Inner Join Mst_Code C On C.CodeId=D.CodeID Where C.Name='PaymentType' 
@@ -455,6 +482,8 @@ Update  mst_VisitType Set CategoryId =
 		End	
 Where CategoryId Is Null  
 Go
+
+
 update  mst_VisitType set VisitName='Pharmacy' where VisitName='Pharmacy Order'
 Update V Set
 		FeatureID = F.FeatureID
