@@ -220,7 +220,7 @@ namespace Four2One
                 iqcareVersion = GetIQCareVersion(CreateConnectionString(txtSQLServer.Text
                     , txtUserName.Text, txtPassword.Password, cBDatabase.Text
                     ));
-                if (iqcareVersion.ToLower() == "4.0.0")
+                if (iqcareVersion.ToLower() == "4.1.0")
                 {
                     imgIQCareDB.Source = faCheck;
                     BIQCareDB.BorderBrush = check;
