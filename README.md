@@ -4,6 +4,35 @@
 
 ## Data Elements migrated
 
+### v1.0.0.12
+- Base Encounter
+	- Visit Date
+	- Visit Type (Self, TS)
+	- Visit Scheduled?
+	- Appointment Dates
+- Vitals
+ 	- Height
+	- Weight
+	- BP
+	- HR
+	- RR
+	- BMI
+	- BMIz
+	- Weight for Height
+	- Weight for Age
+	- Temperature
+	- MUAC
+	- Head Circumference
+- Base Pharmacy Form
+- Lab
+	- New Lab System Objects
+	- Lab Orders
+	- Lab Results for
+		- CD4 Counts
+		- VL
+		- Hb
+	
+
 ### v1.0.0.10
 
 - All System Objects 
@@ -13,8 +42,6 @@
 	- Altered Tables
 	- Views
 - All System Data
-
-### The following patient specific data elements will be migrated if available.
 
 - Patient Registration & Enrollment to Green Card Module
 	- Patient Names
