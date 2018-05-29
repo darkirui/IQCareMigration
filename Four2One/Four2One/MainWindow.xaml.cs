@@ -148,6 +148,7 @@ namespace Four2One
         {
             return string.Format("server = {0}; user id={1}; password={2};database={3}", server, username, pass, db);
         }
+
         private DataTable GetIQCareDBs(string connString)
         {
             Entity en = new Entity();
@@ -372,7 +373,12 @@ namespace Four2One
                 DBPrep(conn);
                 MigrateRegistrations(conn, county, MFLCode);
                 MigrateTreatmentSupporters(conn);
-                MigrateHisoryAndBaseline(conn);
+                //MigrateHisoryAndBaseline(conn);
+                MigrateEncounters(conn);
+                MigrateVitals(conn);
+                MigrateAppointments(conn);
+                MigratePharmacy(conn);
+                MigrateLabs(conn);
             }
             catch(Exception ex)
             {
@@ -394,6 +400,178 @@ namespace Four2One
                 btnSave.IsEnabled = true;
             }));
 
+        }
+
+        private void MigrateLabs(ServerConnection conn)
+        {
+            txtHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                txtHistory.Text = "Migrating Labs";
+            }));
+            imgHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\Lab\\LabObjects.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Created Lab Objects");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
+
+            s = "Scripts\\Migration\\Lab\\MigrateLabOrders.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Migrated Lab Orders");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
+
+            s = "Scripts\\Migration\\Lab\\CD4CountResults.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Migrated CD4 Counts");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
+
+            s = "Scripts\\Migration\\Lab\\VLResults.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Migrated Viral Loads");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
+
+            s = "Scripts\\Migration\\Lab\\HbResults.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Migrated Hb Tests");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
+        }
+
+        private void MigrateAppointments(ServerConnection conn)
+        {
+            txtHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                txtHistory.Text = "Migrating Appointments";
+            }));
+            imgHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\Appointments.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Migrated Appointments");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
+        }
+
+        private void MigratePharmacy(ServerConnection conn)
+        {
+            txtHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                txtHistory.Text = "Migrating Pharmacy";
+            }));
+            imgHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\Pharmacy.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Migrated Pharmacy");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
+        }
+
+        private void MigrateVitals(ServerConnection conn)
+        {
+            txtHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                txtHistory.Text = "Migrating Vitals";
+            }));
+            imgHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\Vitals.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Migrated Vitals");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
+        }
+
+        private void MigrateEncounters(ServerConnection conn)
+        {
+            txtHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                txtHistory.Text = "Migrating Encounters";
+            }));
+            imgHistory.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\EncounterMaster.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtHistory, imgHistory, "Migrated Encounters");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtHistory, imgHistory, s);
+            }
         }
 
         private void DBPrep(ServerConnection conn)
@@ -449,7 +627,7 @@ namespace Four2One
             }));
             try
             {
-                foreach (string s in Directory.GetFiles("Scripts\\Migration"))
+                /*foreach (string s in Directory.GetFiles("Scripts\\Migration"))
                 {
                     if (File.Exists(s))
                     {
@@ -464,21 +642,29 @@ namespace Four2One
                             LogException(ex, txtReg, imgReg, s);
                         }
                     }
-                }
+                }*/
+
+                string s = "Scripts\\Migration\\Registration.sql";
+
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);            
+
+
                 Entity en = new Entity();
                 ClsUtility.Init_Hashtable();
                 ClsUtility.AddParameters("@CountyName", SqlDbType.VarChar, county);
                 ClsUtility.AddParameters("@MFLCode", SqlDbType.VarChar, mflCode);
 
                 int i = (int)en.ReturnObject(conn.ConnectionString, ClsUtility.theParams
-                    , "pr_hamisha_registration", ClsUtility.ObjectEnum.ExecuteNonQuery);
+                    , "pr_421_registration", ClsUtility.ObjectEnum.ExecuteNonQuery);
 
                 LogSuccess(txtReg, imgReg, "Migrated Registrations!");
-                
+
             }
             catch (Exception ex)
             {
-                LogException(ex, txtReg, imgReg, "pr_hamisha_registration");
+                LogException(ex, txtReg, imgReg, "pr_421_registration");
             }
         }
 

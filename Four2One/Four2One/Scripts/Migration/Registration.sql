@@ -1,9 +1,9 @@
-﻿/*IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pr_hamisha_registration]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].pr_hamisha_registration
+﻿IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[pr_421_registration]') AND type in (N'P', N'PC'))
+DROP PROCEDURE [dbo].pr_421_registration
 GO
 
 
-CREATE PROC pr_hamisha_registration(@CountyName VARCHAR(100), @MFLCode VARCHAR(100)) AS
+CREATE PROC pr_421_registration(@CountyName VARCHAR(100), @MFLCode VARCHAR(100)) AS
 BEGIN
 
 declare @MaleID as INT = (SELECT LookupItemId FROM LookupMasterItem WHERE DisplayName = N'Male' AND LookupMasterId = 17)
@@ -32,7 +32,6 @@ DECLARE @Ptn_Pk VARCHAR(10),
 @EmailAddress VARBINARY(MAX),
 @PopulationType VARCHAR(500),
 @PopulationCategory VARCHAR(500),
-@HIVTestDate VARCHAR(20),
 @EnrollmentDate VARCHAR(20),
 @EntryPoint VARCHAR(500),
 @PatientType VARCHAR(10),
@@ -43,59 +42,6 @@ Open symmetric key Key_CTC decryption by password='ttwbvXWpqb5WOLfLrBgisw=='
 DECLARE @C as cursor
 Set @C =  CURSOR FOR
 
-WITH RandomSources AS (
-select ptn_pk
-, CASE WHEN FirstLineRegStDate IS NULL OR YEAR(FirstLineRegStDate) = 1900 THEN NULL ELSE 
-FirstLineRegStDate END AS StartARTDate
-, CASE WHEN a.FirstLineReg = '' THEN NULL 
-       WHEN ISNUMERIC(a.FirstLineReg) = 1 THEN (SELECT RegimenName FROM mst_Regimen m WHERE m.RegimenID = a.FirstLineReg) 
-	   ELSE a.FirstLineReg END AS StartRegimen
-, NULL TransferInFrom
-, NULL MFLCode
-from dtl_PatientARTCare a 
-WHERE CASE WHEN FirstLineRegStDate IS NULL OR YEAR(FirstLineRegStDate) = 1900 THEN NULL ELSE 
-FirstLineRegStDate END IS NOT NULL
-
-UNION
-
-select Ptn_pk
-, CurrentARTStartDate StartARTDate
-, CASE WHEN CurrentART = '' THEN NULL ELSE CurrentART END StartRegimen
-, b.Name TransferInFrom
-, b.MFLCode
-from dtl_PatientHivPrevCareIE a LEFT JOIN 
-mst_LPTF b ON a.ARTTransferInFrom = b.ID
-where PrevARVExposure = 1 and YEAR(CurrentARTStartDate) > 1900
-
-UNION
-
-select ptn_pk
-, CASE WHEN YEAR(ARTStartDate) = 1900 THEN NULL ELSE ARTStartDate END AS StartARTDate 
-, NULL StartRegimen
-, NULL TransferInFrom
-, NULL MFLCode
-from dtl_PatientHivPrevCareEnrollment
-WHERE  CASE WHEN YEAR(ARTStartDate) = 1900 THEN NULL ELSE ARTStartDate END IS NOT NULL)
-
-, TransferInOnART AS (
-
-select a.Ptn_Pk PatientPK
-, b.StartARTDate
-, b.StartRegimen
-, b.TransferInFrom
-, b.MFLCode
- from mst_Patient a INNER JOIN (
-Select a.ptn_pk 
-, MAX(CAST(StartARTDate as DATE)) StartARTDate
-, MAX(StartRegimen) StartRegimen
-, MAX(TransferInFrom) TransferInFrom
-, MAX(MFLCode) MFLCode
-FROM RandomSources a 
-GROUP BY a.ptn_pk)
-b ON a.ptn_pk = b.Ptn_Pk
-WHERE (a.DeleteFlag = 0 OR a.DeleteFlag IS NULL)
-and b.StartARTDate < a.RegistrationDate
-)
 
 select a.Ptn_Pk
 	, CAST(YEAR(regCCC.RegistrationAtCCC) AS VARCHAR(10)) + '-' + CAST(ROW_NUMBER() OVER(PARTITION BY YEAR(regCCC.RegistrationAtCCC) ORDER BY regCCC.RegistrationAtCCC) AS VARCHAR(10)) AS PatientIndex
@@ -125,9 +71,6 @@ select a.Ptn_Pk
 	--**Patient Population
 	, 'General Population' PopulationType
 	, 0 PopulationCategory
-
-	--**HIVReConfirmatoryTest
-	, COALESCE(CONVERT(VARCHAR(10),  b.HIVTestDate, 111),'1900/01/01') HIVTestDate
 	--, a.RegistrationDate
 
 
@@ -141,8 +84,8 @@ select a.Ptn_Pk
 	WHEN EntryPoint.Name IS NULL THEN 0 --Not Documented
 	ELSE 25 --Other
 	END AS EntryPoint
-	, CASE WHEN TransferInOnART.PatientPK IS NOT NULL Then 260 ELSE 261 END AS PatientType
-	, (CASE WHEN TransferInOnART.PatientPK IS NOT NULL THEN '99999' ELSE @MFLCode END) + '-' + PatientEnrollmentID PatientEnrollmentID
+	, 261 PatientType
+	, @MFLCode + '-' + PatientEnrollmentID PatientEnrollmentID
 
 	--**MaritalStatus
 	
@@ -159,14 +102,6 @@ select a.Ptn_Pk
 
 
 	 from mst_Patient a
-	 LEFT JOIN (Select a.ptn_pk, Min(HIVDate)HIVTestDate From 
-				(Select a.ptn_pk, a.ConfirmHIVPosDate HIVDate
-				From dtl_PatientHivPrevCareEnrollment a  
-				Where a.ConfirmHIVPosDate Is Not Null And a.ConfirmHIVPosDate <> Cast('' as datetime)
-				union
-				Select a.ptn_pk, a.DateHIVDiagnosis
-				From dtl_PatientClinicalStatus a 
-				Where a.DateHIVDiagnosis Is Not Null And a.DateHIVDiagnosis <> Cast('' as datetime)) a group by a.ptn_pk) b ON a.Ptn_Pk = b.ptn_pk
 
 	INNER JOIN (Select a.Ptn_pk
 	, MAX(e.FacilityName) f
@@ -190,10 +125,7 @@ select a.Ptn_Pk
 	Group By a.Ptn_pk) regCCC ON a.Ptn_Pk = regCCC.Ptn_pk
 
 	left join mst_decode EntryPoint on a.ReferredFrom = EntryPoint.ID and EntryPoint.CodeID IN (17, 1089)	
-
-	left join TransferInOnART on a.ptn_pk = TransferInOnART.PatientPK
 	LEFT join mst_Decode MaritalStatus on a.MaritalStatus = MaritalStatus.ID
-
 	where 
 	a.MovedToPatientTable = 0	and 
 	a.DeleteFlag = 0
@@ -225,7 +157,6 @@ FETCH NEXT FROM @C INTO
 @EmailAddress,
 @PopulationType,
 @PopulationCategory,
-@HIVTestDate,
 @EnrollmentDate,
 @EntryPoint,
 @PatientType,
@@ -309,24 +240,6 @@ INSERT INTO [dbo].[PersonContact]
            ,NULL
            ,1 ,0 ,1 ,GETDATE() ,NULL);
 
-		   /*
-IF (YEAR(CAST('''+@HIVTestDate+''' AS DATE)) > 1980)
-INSERT INTO [dbo].[HIVReConfirmatoryTest]
-           ([PersonId]
-           ,[TypeOfTest]
-           ,[TestResult]
-           ,[TestResultDate]
-           ,[DeleteFlag]
-           ,[CreatedBy]
-           ,[CreateDate]
-           ,[AuditData])
-     VALUES
-           (@PersonID
-           ,266 --TODO = PCR
-           ,1443 --TODO = Positive
-           ,CAST('''+@HIVTestDate+''' AS DATE)
-           ,0 ,1 ,GETDATE() ,NULL);
-		   */
 
 INSERT INTO [dbo].[PatientMaritalStatus]
            ([PersonId]
@@ -486,7 +399,6 @@ FETCH NEXT FROM @C INTO
 @EmailAddress,
 @PopulationType,
 @PopulationCategory,
-@HIVTestDate,
 @EnrollmentDate,
 @EntryPoint,
 @PatientType,
@@ -501,4 +413,3 @@ DEALLOCATE @C
 Close symmetric key Key_CTC
 
 END
-*/

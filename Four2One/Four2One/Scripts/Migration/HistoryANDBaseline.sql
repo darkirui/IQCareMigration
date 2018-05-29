@@ -387,10 +387,10 @@ BEGIN
 				,CAST('''+@RegistrationDate+''' AS DATETIME)
 				,CAST('''+@StartARTDate+''' AS DATETIME)
 				,'''+@StartRegimen+'''
-				,'''+@TransferInFrom+'''
-				,'''+@MFLCode+'''
-				,''Unknown''
-				,''''
+				,CASE WHEN '''+@TransferInFrom+''' = '''' THEN ''Not Documented'' ELSE '''+@TransferInFrom+''' END
+				,CASE WHEN '''+@MFLCode+''' = '''' THEN ''99999'' ELSE '''+@MFLCode+''' END
+				,''48''
+				,'''+@StartRegimen+''' --Transfer In Notes
 				,0
 				,1
 				,GETDATE()
