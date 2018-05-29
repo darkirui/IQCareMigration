@@ -102,7 +102,7 @@ namespace Four2One
                 imgUserName.Source = faCheck;
                 BUserName.BorderBrush = check;
             }
-            if(iqcareVersion != "4.1.0")
+            if(iqcareVersion != "4.1.0" || iqcareVersion != "4.0.0")
             {
                 imgIQCareDB.Source = icWarning;
                 BIQCareDB.BorderBrush = warning;
@@ -221,7 +221,7 @@ namespace Four2One
                 iqcareVersion = GetIQCareVersion(CreateConnectionString(txtSQLServer.Text
                     , txtUserName.Text, txtPassword.Password, cBDatabase.Text
                     ));
-                if (iqcareVersion.ToLower() == "4.1.0")
+                if (iqcareVersion.ToLower() == "4.1.0" || iqcareVersion.ToLower() == "4.0.0")
                 {
                     imgIQCareDB.Source = faCheck;
                     BIQCareDB.BorderBrush = check;
