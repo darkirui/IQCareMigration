@@ -102,7 +102,7 @@ namespace Four2One
                 imgUserName.Source = faCheck;
                 BUserName.BorderBrush = check;
             }
-            if(iqcareVersion != "4.1.0" || iqcareVersion != "4.0.0")
+            if(!(iqcareVersion == "4.1.0" || iqcareVersion == "4.0.0"))
             {
                 imgIQCareDB.Source = icWarning;
                 BIQCareDB.BorderBrush = warning;
@@ -371,18 +371,12 @@ namespace Four2One
             {
                 BackupDB(connectionString);
                 DBPrep(conn);
-                MigrateRegistrations(conn, county, MFLCode);
-                MigrateTreatmentSupporters(conn);
-                //MigrateHisoryAndBaseline(conn);
-                MigrateEncounters(conn);
-                MigrateVitals(conn);
-                MigrateAppointments(conn);
-                MigratePharmacy(conn);
-                MigrateLabs(conn);
+                MigrateData(conn, mFLCode, county);
+               
             }
             catch(Exception ex)
             {
-                LogException(ex, txtBackup, imgBackup);
+                LogException(ex, txtSystem, imgSystem);
             }
 
             imgGo.Dispatcher.Invoke((Action)(() =>
@@ -402,40 +396,120 @@ namespace Four2One
 
         }
 
+        private void MigrateData(ServerConnection conn, string theMFLCode, string theCounty)
+        {
+            
+            /*MigrateTreatmentSupporters(conn);
+            //MigrateHisoryAndBaseline(conn);
+            MigrateEncounters(conn);
+            MigrateVitals(conn);
+            MigrateAppointments(conn);
+            MigratePharmacy(conn);
+            MigrateLabs(conn);
+            MigratePresentingComplaints(conn);
+            MigrateAdverseEvents(conn);
+            */
+
+            try
+            {
+                MigrateRegistrations(conn, theCounty, theMFLCode);
+                MigrateEncounters(conn);
+                MigrateVitals(conn);
+                MigrateAppointments(conn);
+                MigratePharmacy(conn);
+                MigrateLabs(conn);
+                MigratePresentingComplaints(conn);
+                MigrateAdverseEvents(conn);
+                LogSuccess(txtMigrateData, imgMigrateData, "Migrated Client Data!");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private void MigrateAdverseEvents(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Adverse Events";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\AdverseEvents.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated Adverse Events :-)");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+        }
+
+        private void MigratePresentingComplaints(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Presenting Complaints";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\PresentingComplaints.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated Presenting Complaints");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+        }
+
         private void MigrateLabs(ServerConnection conn)
         {
-            txtHistory.Dispatcher.Invoke((Action)(() =>
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                txtHistory.Text = "Migrating Labs";
+                txtMigrateData.Text = "Migrating Labs";
             }));
-            imgHistory.Dispatcher.Invoke((Action)(() =>
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
             }));
-            string s = "Scripts\\Migration\\Lab\\LabObjects.sql";
+            /*string s = "Scripts\\Migration\\Lab\\LabObjects.sql";
             try
             {
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Created Lab Objects");
+                LogSuccess(txtMigrateData, imgMigrateData, "Created Lab Objects");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtHistory, imgHistory, s);
-            }
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }*/
 
-            s = "Scripts\\Migration\\Lab\\MigrateLabOrders.sql";
+            string s = "Scripts\\Migration\\Lab\\MigrateLabOrders.sql";
             try
             {
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Migrated Lab Orders");
+                LogInfo("Migrated Lab Orders");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtHistory, imgHistory, s);
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
 
             s = "Scripts\\Migration\\Lab\\CD4CountResults.sql";
@@ -444,11 +518,11 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Migrated CD4 Counts");
+                LogInfo("Migrated CD4 Counts");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtHistory, imgHistory, s);
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
 
             s = "Scripts\\Migration\\Lab\\VLResults.sql";
@@ -457,11 +531,11 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Migrated Viral Loads");
+                LogInfo("Migrated Viral Loads");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtHistory, imgHistory, s);
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
 
             s = "Scripts\\Migration\\Lab\\HbResults.sql";
@@ -470,23 +544,39 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Migrated Hb Tests");
+                LogInfo("Migrated Hb Tests");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtHistory, imgHistory, s);
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
+
+
+            s = "Scripts\\Migration\\Lab\\LabPatientEncounter.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Created Lab Encounters");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+
+
         }
 
         private void MigrateAppointments(ServerConnection conn)
         {
-            txtHistory.Dispatcher.Invoke((Action)(() =>
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                txtHistory.Text = "Migrating Appointments";
+                txtMigrateData.Text = "Migrating Appointments";
             }));
-            imgHistory.Dispatcher.Invoke((Action)(() =>
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
             }));
             string s = "Scripts\\Migration\\Appointments.sql";
             try
@@ -494,23 +584,23 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Migrated Appointments");
+                LogInfo("Migrated Appointments");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtHistory, imgHistory, s);
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
         private void MigratePharmacy(ServerConnection conn)
         {
-            txtHistory.Dispatcher.Invoke((Action)(() =>
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                txtHistory.Text = "Migrating Pharmacy";
+                txtMigrateData.Text = "Migrating Pharmacy";
             }));
-            imgHistory.Dispatcher.Invoke((Action)(() =>
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
             }));
             string s = "Scripts\\Migration\\Pharmacy.sql";
             try
@@ -518,23 +608,23 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Migrated Pharmacy");
+                LogInfo("Migrated Pharmacy");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtHistory, imgHistory, s);
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
         private void MigrateVitals(ServerConnection conn)
         {
-            txtHistory.Dispatcher.Invoke((Action)(() =>
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                txtHistory.Text = "Migrating Vitals";
+                txtMigrateData.Text = "Migrating Vitals";
             }));
-            imgHistory.Dispatcher.Invoke((Action)(() =>
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
             }));
             string s = "Scripts\\Migration\\Vitals.sql";
             try
@@ -542,23 +632,23 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Migrated Vitals");
+                LogInfo("Migrated Vitals");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtHistory, imgHistory, s);
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
         private void MigrateEncounters(ServerConnection conn)
         {
-            txtHistory.Dispatcher.Invoke((Action)(() =>
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                txtHistory.Text = "Migrating Encounters";
+                txtMigrateData.Text = "Migrating Encounters";
             }));
-            imgHistory.Dispatcher.Invoke((Action)(() =>
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
             }));
             string s = "Scripts\\Migration\\EncounterMaster.sql";
             try
@@ -566,11 +656,11 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Migrated Encounters");
+                LogInfo("Migrated Encounters");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtHistory, imgHistory, s);
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
@@ -579,55 +669,33 @@ namespace Four2One
             try
             {
                 UpdateTableStructure(conn);
-                UpdateFunctions(conn);
                 UpdateViews(conn);
+                UpdateFunctions(conn);
                 UpdateSPs(conn);
                 UpdateData(conn);
+                UpdateVersion(conn);
+
+                LogSuccess(txtSystem, imgSystem, "Updated System Objects!");
             }
             catch(Exception ex)
             {
-                //LogException(ex, txtBackup, imgBackup);
                 throw ex;
             }
         }
 
-        private void MigrateHisoryAndBaseline(ServerConnection conn)
+        private void UpdateVersion(ServerConnection conn)
         {
-            txtHistory.Dispatcher.Invoke((Action)(() =>
+            txtSystem.Dispatcher.Invoke((Action)(() =>
             {
-                txtHistory.Text = "Migrating Treatment History & Baseline";
+                txtSystem.Text = "Updating Version";
             }));
-            imgHistory.Dispatcher.Invoke((Action)(() =>
+            imgSystem.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgHistory, progressWheel);
-            }));
-            string s = "Scripts\\Migration\\HistoryANDBaseline.sql";
-            try
-            {
-                FileInfo f = new FileInfo(s);
-                string fs = f.OpenText().ReadToEnd();
-                conn.ExecuteNonQuery(fs);
-                LogSuccess(txtHistory, imgHistory, "Migrated Treatment History & Baseline Data");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtHistory, imgHistory, s);
-            }
-        }
-
-        private void MigrateRegistrations(ServerConnection conn, string county, string mflCode)
-        {
-            txtReg.Dispatcher.Invoke((Action)(() =>
-            {
-                txtReg.Text = "Migrating Registrations";
-            }));
-            imgReg.Dispatcher.Invoke((Action)(() =>
-            {
-                ImageBehavior.SetAnimatedSource(imgReg, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
             }));
             try
             {
-                /*foreach (string s in Directory.GetFiles("Scripts\\Migration"))
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\Version"))
                 {
                     if (File.Exists(s))
                     {
@@ -639,12 +707,56 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            LogException(ex, txtReg, imgReg, s);
+                            throw ex;
                         }
                     }
-                }*/
+                }
+                LogInfo("Updated IQCare Version!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "IQCare Version Update");
+            }
+        }
 
-                string s = "Scripts\\Migration\\Registration.sql";
+        private void MigrateHisoryAndBaseline(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Treatment History & Baseline";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\HistoryANDBaseline.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtMigrateData, imgMigrateData, "Migrated Treatment History & Baseline Data");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+        }
+
+        private void MigrateRegistrations(ServerConnection conn, string county, string mflCode)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Registrations";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            try
+            {
+
+                string s = "Scripts\\Migration\\NewRegistration.sql";
 
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
@@ -659,28 +771,28 @@ namespace Four2One
                 int i = (int)en.ReturnObject(conn.ConnectionString, ClsUtility.theParams
                     , "pr_421_registration", ClsUtility.ObjectEnum.ExecuteNonQuery);
 
-                LogSuccess(txtReg, imgReg, "Migrated Registrations!");
+                LogInfo("Migrated Registrations!");
 
             }
             catch (Exception ex)
             {
-                LogException(ex, txtReg, imgReg, "pr_421_registration");
+                LogException(ex, txtMigrateData, imgMigrateData, "pr_421_registration");
             }
         }
 
         private void UpdateSPs(ServerConnection conn)
         {
-            txtSPs.Dispatcher.Invoke((Action)(() =>
+            txtSystem.Dispatcher.Invoke((Action)(() =>
             {
-                txtSPs.Text = "Updating Stored Procedures";
+                txtSystem.Text = "Updating Stored Procedures";
             }));
-            imgSPs.Dispatcher.Invoke((Action)(() =>
+            imgSystem.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgSPs, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
             }));
             try
             {
-                foreach (string s in Directory.GetFiles("Scripts\\DBPrep\\SPs"))
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\SPs"))
                 {
                     if (File.Exists(s))
                     {
@@ -692,32 +804,31 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            //LogException(ex, txtSPs, imgSPs, s);
                             throw ex;
                         }
                     }
                 }
-                LogSuccess(txtSPs, imgSPs, "Updated Stored Procedures");               
+                LogInfo("Updated Stored Procedures!");               
             }
             catch (Exception ex)
             {
-                LogException(ex, txtSPs, imgSPs, "SPs");
+                LogException(ex, txtSystem, imgSystem, "SPs");
             }
         }
 
         private void UpdateFunctions(ServerConnection conn)
         {
-            txtFunctions.Dispatcher.Invoke((Action)(() =>
+            txtSystem.Dispatcher.Invoke((Action)(() =>
             {
-                txtFunctions.Text = "Updating Functions";
+                txtSystem.Text = "Updating Functions";
             }));
-            imgFunctions.Dispatcher.Invoke((Action)(() =>
+            imgSystem.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgFunctions, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
             }));
             try
             {
-                foreach (string s in Directory.GetFiles("Scripts\\DBPrep\\UDFs"))
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Functions"))
                 {
                     if (File.Exists(s))
                     {
@@ -729,32 +840,32 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            //LogException(ex, txtFunctions, imgFunctions, s);
                             throw ex;
                         }
                     }
                 }
-                LogSuccess(txtFunctions, imgFunctions, "Updated Functions");                
+                LogInfo("Updated Functions!");                
             }
             catch (Exception ex)
             {
-                LogException(ex, txtFunctions, imgFunctions, "Functions");
+                LogException(ex, txtSystem, imgSystem, "Functions");
             }
         }
 
         private void UpdateViews(ServerConnection conn)
         {
-            txtViews.Dispatcher.Invoke((Action)(() =>
+            txtSystem.Dispatcher.Invoke((Action)(() =>
             {
-                txtViews.Text = "Updating Views";
+                txtSystem.Text = "Updating Views";
             }));
-            imgViews.Dispatcher.Invoke((Action)(() =>
+            imgSystem.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgViews, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
             }));
+
             try
             {
-                foreach (string s in Directory.GetFiles("Scripts\\DBPrep\\Views"))
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Views\\PreView"))
                 {
                     if (File.Exists(s))
                     {
@@ -766,32 +877,56 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            //LogException(ex, txtViews, imgViews, s);
                             throw ex;
                         }
                     }
                 }
-                LogSuccess(txtViews, imgViews, "Updated Views");                
+                LogInfo("Pre-View Objects!");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtViews, imgViews, "Views");
+                LogException(ex, txtSystem, imgSystem, "Pre-View Error!");
             }
+            
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Views"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Updated Views!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "View Error!");
+            }            
         }
 
         private void UpdateData(ServerConnection conn)
         {
-            txtData.Dispatcher.Invoke((Action)(() =>
+            txtSystem.Dispatcher.Invoke((Action)(() =>
             {
-                txtData.Text = "Updating System Data";
+                txtSystem.Text = "Updating System Data";
             }));
-            imgData.Dispatcher.Invoke((Action)(() =>
+            imgSystem.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgData, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
             }));
             try
             {
-                foreach (string s in Directory.GetFiles("Scripts\\DBPrep\\Data"))
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemData"))
                 {
                     if (File.Exists(s))
                     {
@@ -803,32 +938,31 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            //LogException(ex, txtData, imgData, s);
                             throw ex;
                         }
                     }
                 }
-                LogSuccess(txtData, imgData, "Updated System Data");                
+                LogInfo("Updated System Data");                
             }
             catch (Exception ex)
             {
-                LogException(ex, txtData, imgData, "System Data");
+                LogException(ex, txtSystem, imgSystem, "System Data");
             }
         }
 
         private void UpdateTableStructure(ServerConnection conn)
         {
-            txtTableStructure.Dispatcher.Invoke((Action)(() =>
+            txtSystem.Dispatcher.Invoke((Action)(() =>
             {
-                txtTableStructure.Text = "Updating Table Structure";
+                txtSystem.Text = "Updating Table Structure";
             }));
-            imgTableStructure.Dispatcher.Invoke((Action)(() =>
+            imgSystem.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgTableStructure, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
             }));
             try
             {
-                foreach (string s in Directory.GetFiles("Scripts\\DBPrep\\TableStructure"))
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Tables\\NewTables"))
                 {
                     if (File.Exists(s))
                     {
@@ -840,28 +974,77 @@ namespace Four2One
                         }
                         catch (Exception ex)
                         {
-                            //LogException(ex, txtTableStructure, imgTableStructure, s);
                             throw ex;
                         }
                     }
                 }
-                LogSuccess(txtTableStructure, imgTableStructure, "Updated Table Structure");                
+                LogInfo("New Tables!");                
             }
             catch (Exception ex)
             {
-                LogException(ex, txtTableStructure, imgTableStructure, "Table Structure");
+                LogException(ex, txtSystem, imgSystem, "Table Structure");
+            }
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Tables\\TableEdits"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Table Edits!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Table Structure");
+            }
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Tables\\Labs"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Lab Tables!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Labs");
             }
         }
 
         private void MigrateTreatmentSupporters(ServerConnection conn)
         {
-            txtTS.Dispatcher.Invoke((Action)(() =>
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                txtTS.Text = "Migrating Treatment Supporters";
+                txtMigrateData.Text = "Migrating Treatment Supporters";
             }));
-            imgTS.Dispatcher.Invoke((Action)(() =>
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
             {
-                ImageBehavior.SetAnimatedSource(imgTS, progressWheel);
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
             }));
             string s = "Scripts\\Migration\\PatientTreatmentSupporter.sql";
             try
@@ -869,11 +1052,11 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();            
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtTS, imgTS, "Migrated Treatment Supporters");
+                LogSuccess(txtMigrateData, imgMigrateData, "Migrated Treatment Supporters");
             }
             catch (Exception ex)
             {
-                LogException(ex, txtTS, imgTS, s);
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
@@ -881,13 +1064,13 @@ namespace Four2One
         {
             try
             {
-                txtBackup.Dispatcher.Invoke((Action)(() =>
+                txtSystem.Dispatcher.Invoke((Action)(() =>
                 {
-                    txtBackup.Text = "Backing Up";
+                    txtSystem.Text = "Backing Up";
                 }));
-                imgBackup.Dispatcher.Invoke((Action)(() =>
+                imgSystem.Dispatcher.Invoke((Action)(() =>
                 {
-                    ImageBehavior.SetAnimatedSource(imgBackup, progressWheel);
+                    ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
                 }));
                 ServerConnection srvConn = new ServerConnection
                 {
@@ -906,11 +1089,11 @@ namespace Four2One
 
                 srvConn.ExecuteNonQuery(backupSQL);
 
-                LogSuccess(txtBackup, imgBackup, "DB Backed Up to " + backupPath);
+                LogSuccess(txtSystem, imgSystem, "DB Backed Up to " + backupPath);
             }
             catch (Exception ex)
             {
-                LogException(ex, txtBackup, imgBackup, "Backup");
+                LogException(ex, txtSystem, imgSystem, "Backup");
             }
         }
 
@@ -923,11 +1106,20 @@ namespace Four2One
 
             txtAction.Dispatcher.Invoke((Action)(() =>
             {
-                txtAction.Text += " - DONE!";
+                txtAction.Text = successsMessage;
             }));
+
             imgAction.Dispatcher.Invoke((Action)(() =>
             {
                 ImageBehavior.SetAnimatedSource(imgAction, faCheck);
+            }));
+        }
+
+        private void LogInfo(string infoMessage)
+        {
+            txtLog.Dispatcher.Invoke((Action)(() =>
+            {
+                txtLog.Text += " \n INFO: " + infoMessage;
             }));
         }
 
@@ -985,14 +1177,14 @@ namespace Four2One
             }
             finally
             {
-                txtAction.Dispatcher.Invoke((Action)(() =>
-                {
-                    txtAction.Text += " - ERROR!";
-                }));
-                imgAction.Dispatcher.Invoke((Action)(() =>
-                {
-                    ImageBehavior.SetAnimatedSource(imgAction, icWarning);
-                }));
+                //txtAction.Dispatcher.Invoke((Action)(() =>
+                //{
+                //    txtAction.Text += " - ERROR!";
+                //}));
+                //imgAction.Dispatcher.Invoke((Action)(() =>
+                //{
+                //    ImageBehavior.SetAnimatedSource(imgAction, icWarning);
+                //}));
             }
         }
 

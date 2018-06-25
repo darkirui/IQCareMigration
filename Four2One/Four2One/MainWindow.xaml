@@ -343,20 +343,19 @@
                         <TextBlock 
                             Grid.Column="0" 
                             Text=""                            
-                            Name="txtBackup"                             
+                            Name="txtSystem"                             
                             IsEnabled="False"
                         HorizontalAlignment="Right"
                         TextWrapping="Wrap"
                              />
                         <Image Grid.Column="1"
-                           x:Name="imgBackup"                             
+                           x:Name="imgSystem"                             
                                Stretch="Uniform"
                                MaxHeight="16"
                                MaxWidth="16"                        
                        />
-                    </Grid>
-
-
+                    </Grid>   
+                   
                     <Grid Margin="0,5,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="9*"/>
@@ -365,160 +364,13 @@
                         <TextBlock 
                             Grid.Column="0" 
                             Text=""                            
-                            Name="txtTableStructure"                             
-                            IsEnabled="False"
-                        HorizontalAlignment="Right"
-                        TextWrapping="Wrap"
-                             />
-                        <Image Grid.Column="1"
-                           x:Name="imgTableStructure"
-                           Stretch="Uniform"
-                           MaxHeight="16"
-                           MaxWidth="16"                               
-                       />
-                    </Grid>
-                    <Grid Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="9*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock 
-                            Grid.Column="0" 
-                            Text=""                            
-                            Name="txtFunctions"                             
-                            IsEnabled="False"
-                        HorizontalAlignment="Right"
-                    TextWrapping="Wrap"
-                             />
-                        <Image Grid.Column="1"
-                           x:Name="imgFunctions"
-                           Stretch="Uniform"
-                           MaxHeight="16"
-                           MaxWidth="16"                               
-                       />
-                    </Grid>
-
-                    <Grid Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="9*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock 
-                            Grid.Column="0" 
-                            Text=""                            
-                            Name="txtViews"                             
-                            IsEnabled="False"
-                        HorizontalAlignment="Right"
-                    TextWrapping="Wrap"
-                             />
-                        <Image Grid.Column="1"
-                           x:Name="imgViews"
-                           Stretch="Uniform"
-                           MaxHeight="16"
-                           MaxWidth="16"                               
-                       />
-                    </Grid>
-
-
-
-                    <Grid Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="9*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock 
-                            Grid.Column="0" 
-                            Text=""                            
-                            Name="txtSPs"                             
-                            IsEnabled="False"
-                        HorizontalAlignment="Right"
-                    TextWrapping="Wrap"
-                             />
-                        <Image Grid.Column="1"
-                           x:Name="imgSPs"
-                           Stretch="Uniform"
-                           MaxHeight="16"
-                           MaxWidth="16"                               
-                       />
-                    </Grid>
-
-                    <Grid Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="9*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock 
-                            Grid.Column="0" 
-                            Text=""                            
-                            Name="txtData"                             
-                            IsEnabled="False"
-                        HorizontalAlignment="Right"
-                    TextWrapping="Wrap"
-                             />
-                        <Image Grid.Column="1"
-                           x:Name="imgData"
-                           Stretch="Uniform"
-                           MaxHeight="16"
-                           MaxWidth="16"                               
-                       />
-                    </Grid>
-
-                    <Grid Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="9*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock 
-                            Grid.Column="0" 
-                            Text=""                            
-                            Name="txtReg"                             
-                            IsEnabled="False"
-                        HorizontalAlignment="Right"
-                    TextWrapping="Wrap"
-                             />
-                        <Image Grid.Column="1"
-                           x:Name="imgReg"
-                           Stretch="Uniform"
-                           MaxHeight="16"
-                           MaxWidth="16"                               
-                       />
-                    </Grid>
-
-                    <Grid Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="9*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock 
-                            Grid.Column="0" 
-                            Text=""                            
-                            Name="txtTS"                             
+                            Name="txtMigrateData"                             
                             IsEnabled="False"
                             HorizontalAlignment="Right"
                             TextWrapping="Wrap"
                              />
                         <Image Grid.Column="1"
-                           x:Name="imgTS"
-                           Stretch="Uniform"
-                           MaxHeight="16"
-                           MaxWidth="16"                               
-                       />
-                    </Grid>
-                    <Grid Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="9*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock 
-                            Grid.Column="0" 
-                            Text=""                            
-                            Name="txtHistory"                             
-                            IsEnabled="False"
-                            HorizontalAlignment="Right"
-                            TextWrapping="Wrap"
-                             />
-                        <Image Grid.Column="1"
-                           x:Name="imgHistory"
+                           x:Name="imgMigrateData"
                            Stretch="Uniform"
                            MaxHeight="16"
                            MaxWidth="16"                               

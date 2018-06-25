@@ -36,3 +36,15 @@ and d.VisitType = 0
 left join PatientVitals e ON d.Id = e.PatientMasterVisitId
 where (b.DeleteFlag = 0 or b.DeleteFlag is null)
 and e.PatientMasterVisitId IS NULL
+GO
+
+
+declare @TriageEncounter varchar(50) = (select top 1 Id from lookupitem where Name = 'Triage-encounter');
+insert into PatientEncounter 
+select a.patientid, @TriageEncounter, a.PatientMasterVisitId, a.createdate, a.createdate
+, 203, 0, 1, a.createdate, null, 0 
+from PatientVitals a 
+where not exists (select 1 from PatientEncounter 
+where PatientId = a.patientid and encountertypeid=@TriageEncounter 
+and patientmastervisitid = a.PatientMasterVisitId)
+GO

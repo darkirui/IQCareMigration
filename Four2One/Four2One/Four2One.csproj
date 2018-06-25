@@ -30,7 +30,7 @@
     <PublisherName>Palladium Group</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>13</ApplicationRevision>
+    <ApplicationRevision>19</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -187,67 +187,106 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Scripts\DBPrep\Data\001 Payment Methods.sql">
+    <Content Include="Scripts\DBUpdate\SystemData\Counties.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Data\002 Table Data.sql">
+    <Content Include="Scripts\DBUpdate\SystemData\Facilities.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Data\011 Data.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\SPs\Pr_Clinical_GetPatient_EnrolledServiceLines.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Data\012 Data_CountyList.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\SPs\pr_Clinical_PatientDetails_Constella.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Data\013 Data_FacilityList.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\AppAdmin.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Data\021 Data.sql">
+    <Content Include="Scripts\DBUpdate\Version\Version.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Data\032 Data.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\Functions\Functions.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Data\041 Data.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\SPs\01 Encryption.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Data\051 Lookup.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\SPs\02 SPs.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Data\99 Unknowns.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\SPs\pr_Admin_SelectFacility_Constella.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Misc\Unknowns.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\SPs\pr_CreateLocalCache_AllMasters_constella.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\SPs\SPs.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\SPs\Pr_Security_UserLogin_Constella.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\TableStructure\0000DropALLTriggers.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\Labs\LabTables.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\TableStructure\0001DropALLIndexes.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\NewTables\NewTables.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\TableStructure\0002NewTables.sql">
+    <Content Include="Scripts\DBUpdate\SystemData\Identification.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\TableStructure\0003TableChanges.sql">
+    <Content Include="Scripts\DBUpdate\SystemData\Lookup.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\TableStructure\9996CreateDefaultConstraintForDeleteFlag.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\dtl_PatientAppointment.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\TableStructure\9997Triggers.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\dtl_patientPharmacyOrder.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\TableStructure\9999Indexes.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_BusinessRule.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\UDFs\UDFs.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_ClinicalService.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\DBPrep\Views\Views.sql">
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_Control.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_Drug.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_Facility.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_Feature.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_Module.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_Patient.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_regimen.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_Section.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\mst_VisitType.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\ord_PatientPharmacyOrder.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Tables\TableEdits\ord_Visit.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Views\Views.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\SystemObjects\Views\PreView\01 PreView GetLookupPreViewCreation.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\AdverseEvents.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\Migration\Appointments.sql">
@@ -268,10 +307,16 @@
     <Content Include="Scripts\Migration\Lab\LabObjects.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\Migration\Lab\LabPatientEncounter.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\Migration\Lab\MigrateLabOrders.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\Migration\Lab\VLResults.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\NewRegistration.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\Migration\PatientTreatmentSupporter.sql">
@@ -280,12 +325,11 @@
     <Content Include="Scripts\Migration\Pharmacy.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\Migration\pr_hamisha_regenrollments.sql">
+    <Content Include="Scripts\Migration\PresentingComplaints.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\Migration\Registration.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Scripts\Migration\pr_hamisha_regenrollments.sql" />
+    <Content Include="Scripts\Migration\Registration.sql" />
     <Content Include="Scripts\Migration\TransferIn.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -312,5 +356,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
