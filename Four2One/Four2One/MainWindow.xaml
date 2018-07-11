@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Four2One"
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
-        Title="Four2One" Height="500" Width="800" 
+        Title="Four2One" Height="800" Width="1000" 
         WindowStartupLocation="CenterScreen" 
         Icon="Resources/421_transparent_icon.ico"
         x:Name="WinMain"

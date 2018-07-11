@@ -31,8 +31,15 @@ IF  Exists (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[dtl_P
 DROP INDEX [NCI_DTL_PatientAppointment_VisitPK_INC] ON [dbo].[dtl_PatientAppointment] WITH ( ONLINE = OFF )
 GO
 
-delete from dtl_PatientAppointment where AppDate is null or appstatus is null or userid is null
-Go
+--delete from dtl_PatientAppointment where AppDate is null or appstatus is null or userid is null
+--Go
+DELETE FROM dtl_PatientAppointment WHERE YEAR(AppDate) = 1900 OR AppDate IS NULL
+GO
+UPDATE dtl_PatientAppointment SET AppStatus = 0 WHERE AppStatus IS NULL
+GO
+UPDATE dtl_PatientAppointment SET UserId = 1 WHERE UserId IS NULL
+GO
+
 
 
 If  Exists (Select * From sys.columns Where Name = N'AppDate' And Object_ID = Object_id(N'dtl_PatientAppointment'))    

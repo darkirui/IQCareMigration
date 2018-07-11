@@ -420,11 +420,161 @@ namespace Four2One
                 MigrateLabs(conn);
                 MigratePresentingComplaints(conn);
                 MigrateAdverseEvents(conn);
-                LogSuccess(txtMigrateData, imgMigrateData, "Migrated Client Data!");
+                MigrateSMSConsent(conn);
+                MigrateICF(conn);
+                MigrateGeneralExamination(conn);
+                MigratePregnancyStatus(conn);
+                MigrateAdherenceAssessment(conn);
+                MigratePHDPServices(conn);
+                LogSuccess(txtMigrateData, imgMigrateData, "Migrated Client Data :-)");
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        private void MigratePHDPServices(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating PHDP Services";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\PHDPServices.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated PHDP Services!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+        }
+
+        private void MigrateAdherenceAssessment(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Adherence Assessment";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\Adherence.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated Adherence Assessment!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+        }
+
+        private void MigratePregnancyStatus(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Pregnancy Status";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\PregnancyStatus.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated Pregnancy Status!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+        }
+
+        private void MigrateGeneralExamination(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating General Exam and Review of Systems";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\GeneralExamination.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated General Exam and Review of Systems!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+        }
+
+        private void MigrateICF(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating TB ICF";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\TBICF.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated TB ICF!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+        }
+
+        private void MigrateSMSConsent(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating SMS Consent";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\SMSConsent.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated SMS Consent!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
@@ -444,7 +594,7 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogInfo("Migrated Adverse Events :-)");
+                LogInfo("Migrated Adverse Events!");
             }
             catch (Exception ex)
             {
@@ -584,7 +734,7 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogInfo("Migrated Appointments");
+                LogInfo("Migrated Appointments!");
             }
             catch (Exception ex)
             {

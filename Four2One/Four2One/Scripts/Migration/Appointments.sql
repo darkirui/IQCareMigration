@@ -3,15 +3,15 @@ select distinct
 d.Id PatientMasterVisitId
 , 258 ServiceAreaId
 , c.Id PatientId
-, a.AppDate
-, 253 ReasonId
+, cast(a.AppDate As DATE) AppDate
+, 235 ReasonId
 , '' [Description]
 , 223 StatusId
-, GETDATE() statusDate
+, cast(a.AppDate As DATE) statusDate
 , 257 DiffCareId
 , 0 DeleteFlag
-, 1 CreatedBy
-, getdate() CreateDate
+, d.CreatedBy
+, d.CreateDate
 , NULL AuditData
  from
 dtl_PatientAppointment a inner join
@@ -25,5 +25,9 @@ where (b.DeleteFlag = 0 or b.DeleteFlag is null)
 and e.PatientMasterVisitId IS NULL
 and YEAR(a.AppDate) between 2000 and 2019;
 
+
+
+
+
 --TODO
-TRUNCATE TABLE dtl_PatientAppointment;
+--TRUNCATE TABLE dtl_PatientAppointment;

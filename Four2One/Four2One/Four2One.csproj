@@ -30,7 +30,7 @@
     <PublisherName>Palladium Group</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>19</ApplicationRevision>
+    <ApplicationRevision>25</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -286,13 +286,22 @@
     <Content Include="Scripts\DBUpdate\SystemObjects\Views\PreView\01 PreView GetLookupPreViewCreation.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\Migration\Adherence.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\Migration\AdverseEvents.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\Migration\Appointments.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\Migration\Disclosure.sql" />
+    <Content Include="Scripts\Migration\DrugHistory.sql" />
     <Content Include="Scripts\Migration\EncounterMaster.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\FamilyHistory.sql" />
+    <Content Include="Scripts\Migration\GeneralExamination.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\Migration\HistoryANDBaseline.sql">
@@ -319,10 +328,18 @@
     <Content Include="Scripts\Migration\NewRegistration.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\Migration\NutritionalAssessment.sql" />
+    <Content Include="Scripts\Migration\PastMedicalHistory.sql" />
     <Content Include="Scripts\Migration\PatientTreatmentSupporter.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\Migration\Pharmacy.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\PHDPServices.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\PregnancyStatus.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\Migration\PresentingComplaints.sql">
@@ -330,12 +347,24 @@
     </Content>
     <Content Include="Scripts\Migration\pr_hamisha_regenrollments.sql" />
     <Content Include="Scripts\Migration\Registration.sql" />
+    <Content Include="Scripts\Migration\SexualHistory.sql" />
+    <Content Include="Scripts\Migration\SMSConsent.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\SupportGroup.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\TBICF.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\TBIPT.sql" />
     <Content Include="Scripts\Migration\TransferIn.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\Migration\Vitals.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\Migration\WHOStaging.sql" />
   </ItemGroup>
   <ItemGroup>
     <PublishFile Include="Microsoft.SqlServer.SqlClrProvider">
