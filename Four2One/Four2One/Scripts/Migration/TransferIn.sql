@@ -1,26 +1,14 @@
-﻿--TODO
+﻿DECLARE 
+@PatientID VARCHAR(50),
+@RegistrationDate VARCHAR(100), 
+@StartARTDate VARCHAR(100),
+@TransferInFrom VARCHAR(1000),
+@StartRegimen VARCHAR(1000)
 
-/*
 
-/****** Object:  StoredProcedure [dbo].[pr_CreateTransferInMaster]    Script Date: 5/21/2018 10:01:15 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-ALTER PROCEDURE [dbo].[pr_CreateTransferInMaster]
-As
-
-BEGIN
-	IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'tmp_TransferIn') AND type in (N'U'))
-	DROP TABLE tmp_TransferIn;
+DECLARE @C as cursor
+Set @C =  CURSOR FOR
 	
-	CREATE TABLE tmp_TransferIn
-	(PatientPK INT NOT NULL	
-	, FacilityFrom VARCHAR(1000) NULL
-	, StartARTDate DATE NULL
-	, StartRegimen VARCHAR(1000) NULL);
-
 WITH HIVEnrollment AS (select 
 		a.Ptn_Pk PatientPK
 		, a.IQNumber
@@ -164,34 +152,128 @@ WITH HIVEnrollment AS (select
 		 , MIN(StartARTDate)StartARTDate FROM triage
 		 WHERE StartARTDate IS NOT NULL
 		 GROUP BY PatientPK)
+, TransferIn AS ( 
+Select a.Ptn_Pk
+, c.FacilityFrom
+, b.StartARTDate
+, c.StartRegimen 
+FROM mst_Patient a 
+LEFT JOIN StartART b ON a.Ptn_Pk = b.PatientPK
+LEFT JOIN (
+Select PatientPK
+, MAX(FacilityFrom) FacilityFrom
+, MAX(StartRegimen) StartRegimen 
+FROM triage
+WHERE Coalesce(FacilityFrom, StartRegimen) IS NOT NULL
+GROUP BY PatientPK) c ON a.Ptn_Pk = c.PatientPK
+WHERE coalesce(b.PatientPK, c.PatientpK) IS NOT NULL)
 
-		 INSERT INTO tmp_TransferIn
-		 Select a.Ptn_Pk
-		 , c.FacilityFrom
-		 , b.StartARTDate
-		 , c.StartRegimen 
-		 FROM mst_Patient a 
-		 LEFT JOIN StartART b ON a.Ptn_Pk = b.PatientPK
-		 LEFT JOIN (
-		 Select PatientPK
-		 , MAX(FacilityFrom) FacilityFrom
-		 , MAX(StartRegimen) StartRegimen 
-		 FROM triage
-		 WHERE Coalesce(FacilityFrom, StartRegimen) IS NOT NULL
-		 GROUP BY PatientPK) c ON a.Ptn_Pk = c.PatientPK
-		 WHERE coalesce(b.PatientPK, c.PatientpK) IS NOT NULL
+Select b.Id PatientId
+, CASE WHEN a.FacilityFrom IS NULL THEN 'Facility From Not Documented' ELSE a.FacilityFrom END AS FacilityFrom
+, CASE WHEN a.StartARTDate IS NULL THEN '' ELSE a.StartARTDate END AS StartARTDate
+, CASE WHEN a.StartRegimen IS NULL THEN 'Start Regimen Not Documented' ELSE a.StartRegimen END AS StartRegimen
+, b.RegistrationDate
+ FROM TransferIn a INNER JOIN Patient b ON a.Ptn_Pk = b.ptn_pk
+ LEFT JOIN PatientMasterVisit c ON b.Id = c.PatientId AND c.VisitType IS NULL
+ WHERE c.Id IS NULL
 
 
-	CREATE CLUSTERED INDEX [IDX_PatientPK] ON 
-	[dbo].[tmp_TransferIn] ([PatientPK] ASC )
-	WITH (PAD_INDEX  = OFF
-	, STATISTICS_NORECOMPUTE  = OFF
-	, SORT_IN_TEMPDB = OFF
-	, IGNORE_DUP_KEY = OFF
-	, DROP_EXISTING = OFF
-	, ONLINE = OFF
-	, ALLOW_ROW_LOCKS  = ON
-	, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]	
+
+OPEN @C
+
+
+
+FETCH NEXT FROM @C INTO 
+
+@PatientID,
+@TransferInFrom,
+@StartARTDate,
+@StartRegimen,
+@RegistrationDate
+
+WHILE @@FETCH_STATUS = 0
+
+BEGIN
+
+EXEC
+('UPDATE Patient 
+SET PatientType = 260 WHERE Id = ' + @PatientID + ';')
+
+EXEC('
+
+DECLARE @PatientMasterVisitID as INT;
+	INSERT INTO dbo.PatientMasterVisit
+				(PatientId
+				, ServiceId
+				, Start
+				, [End]
+				, Active
+				, VisitDate
+				, VisitScheduled
+				, VisitBy
+				, VisitType
+				, Status
+				, CreateDate
+				, DeleteFlag
+				, CreatedBy
+				, AuditData) 
+			VALUES 
+				('+@PatientID+'
+				, 1
+				, CAST('''+@RegistrationDate+''' AS DATETIME)
+				, CAST('''+@RegistrationDate+''' AS DATETIME)
+				, 1
+				, CAST('''+@RegistrationDate+''' AS DATETIME)
+				, 0
+				, 0
+				, NULL
+				, 2
+				, GETDATE(), 0, 1, NULL);
+				
+				SELECT @PatientMasterVisitID = IDENT_CURRENT(''PatientMasterVisit'')
+				
+				IF (YEAR(CAST('''+@StartARTDate+''' AS DATE)) != 1900)
+				INSERT INTO [dbo].[PatientTransferIn]
+				([PatientId]
+				,[PatientMasterVisitId]
+				,[ServiceAreaId]
+				,[TransferInDate]
+				,[TreatmentStartDate]
+				,[CurrentTreatment]
+				,[FacilityFrom]
+				,[MFLCode]
+				,[CountyFrom]
+				,[TransferInNotes]
+				,[DeleteFlag]
+				,[CreatedBy]
+				,[CreateDate]
+				,[AuditData])
+			VALUES
+				('+@PatientID+'
+				,@PatientMasterVisitID
+				,1
+				,CAST('''+@RegistrationDate+''' AS DATETIME)
+				,CAST('''+@StartARTDate+''' AS DATETIME)
+				,'''+@StartRegimen+'''
+				,'''+@TransferInFrom+'''
+				,''99999''
+				,''48''
+				,'''+@StartRegimen+' - '' + '''+@TransferInFrom+''' --Transfer In Notes
+				,0
+				,1
+				,GETDATE()
+				,NULL);
+				
+				')
+
+FETCH NEXT FROM @C INTO 
+@PatientID,
+@TransferInFrom,
+@StartARTDate,
+@StartRegimen,
+@RegistrationDate
 
 END
-*/
+
+CLOSE @C
+DEALLOCATE @C

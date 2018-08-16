@@ -426,11 +426,61 @@ namespace Four2One
                 MigratePregnancyStatus(conn);
                 MigrateAdherenceAssessment(conn);
                 MigratePHDPServices(conn);
+                MigrateTransferIn(conn);
+                MigrateHIVDiagnosisDates(conn);
                 LogSuccess(txtMigrateData, imgMigrateData, "Migrated Client Data :-)");
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        private void MigrateHIVDiagnosisDates(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating HIV Diagnosis Dates";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\HIVTestDate.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated HIV Diagnosis Dates!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+        }
+
+        private void MigrateTransferIn(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Transfers In";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\TransferIn.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated Transfers In!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
