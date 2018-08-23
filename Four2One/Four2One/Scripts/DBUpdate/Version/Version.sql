@@ -1,9 +1,9 @@
 ﻿UPDATE AppAdmin
 SET
-	AppVer='Ver 1.0.0.6 Kenya HMIS',
-	DBVer='Ver 1.0.0.6 Kenya HMIS',
-	RelDate='01-May-2018',
-	VersionName='Ver 1.0.0.6 Kenya HMIS'
+	AppVer='Ver 1.0.0.7 Kenya HMIS',
+	DBVer='Ver 1.0.0.7 Kenya HMIS',
+	RelDate='16-Aug-2018',
+	VersionName='Ver 1.0.0.7 Kenya HMIS'
 GO
 
 UPDATE mst_Facility 

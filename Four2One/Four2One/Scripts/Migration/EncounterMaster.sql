@@ -108,6 +108,7 @@ AND a.VisitType NOT IN (0,4,5,6,12,18,19,101)
 AND b.VisitName NOT IN ('Contact Tracking Form')
 AND b.VisitName NOT LIKE '%enrollment%'
 and d.Id is null
+and a.VisitDate is not null
 GO
 
 INSERT INTO ComplaintsHistory

@@ -125,6 +125,19 @@ IF EXISTS(SELECT name FROM sys.tables WHERE name = N'x_SMSConsent')
 
 	
 INSERT INTO PatientConsent
+
+([PatientId]
+,[PatientMasterVisitId]
+,[ServiceAreaId]
+,[ConsentType]
+,[ConsentDate]
+,[Active]
+,[DeleteFlag]
+,[CreatedBy]
+,[CreateDate]
+)
+
+
 SELECT b.Id PatientId 
 , 0 PatientMasterVisitId
 , 258 ServiceAreaId
@@ -134,9 +147,7 @@ SELECT b.Id PatientId
 , 0 DeleteFlag
 , b.CreatedBy
 , b.CreateDate
-, NULL AuditData
-, NULL DeclineReason
-, NULL ConsentValue
+
 
 FROM x_SMSConsent a 
 INNER JOIN Patient b ON a.PatientPK = b.Ptn_pk

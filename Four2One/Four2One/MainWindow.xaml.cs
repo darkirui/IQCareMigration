@@ -428,11 +428,36 @@ namespace Four2One
                 MigratePHDPServices(conn);
                 MigrateTransferIn(conn);
                 MigrateHIVDiagnosisDates(conn);
+                MigrateClinicIDs(conn);
                 LogSuccess(txtMigrateData, imgMigrateData, "Migrated Client Data :-)");
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        private void MigrateClinicIDs(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Clinic IDs";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\PatientClinicIDs.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated Clinic IDs!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
@@ -873,6 +898,9 @@ namespace Four2One
                 UpdateFunctions(conn);
                 UpdateSPs(conn);
                 UpdateData(conn);
+
+                Deploy1007(conn);
+
                 UpdateVersion(conn);
 
                 LogSuccess(txtSystem, imgSystem, "Updated System Objects!");
@@ -880,6 +908,207 @@ namespace Four2One
             catch(Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        private void Deploy1007(ServerConnection conn)
+        {
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Updating v1.0.0.7";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+
+            //Tables
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Tables"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Tables!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Tables Error!");
+            }
+
+            //Views
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Views"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Views!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Views Error!");
+            }
+
+            //Functions
+
+            /*try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Functions"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Functions!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Functions Error!");
+            }*/
+
+            //SPs
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\SPs"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 SPs!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 SPs Error!");
+            }
+
+            //Triggers
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Triggers"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Triggers!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Triggers Error!");
+            }
+
+            //Data
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Data"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Data!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Data Error!");
+            }           
+
+            //Indexes            
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Indexes"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Indexes!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Indexes Error!");
             }
         }
 
