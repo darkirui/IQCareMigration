@@ -26,6 +26,7 @@ inner join mst_Patient c on a.Ptn_pk = c.Ptn_Pk
 Where  (b.DeleteFlag IS NULL OR b.DeleteFlag = 0)
 AND a.Pregnant IS NOT NULL
 AND c.Sex = 17
+AND CAST(b.VisitDate as DATE) is not null
 go
 
 insert into PregnancyIndicator

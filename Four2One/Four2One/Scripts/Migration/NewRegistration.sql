@@ -23,8 +23,8 @@ INSERT INTO dbo.[Person]
 
 SELECT 
 CASE WHEN FirstName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'Not Documented') ELSE FirstName END FirstName
-,CASE WHEN MiddleName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'Not Documented') ELSE FirstName END MiddleName
-, CASE WHEN LastName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'Not Documented') ELSE FirstName END LastName 
+,CASE WHEN MiddleName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'Not Documented') ELSE MiddleName END MiddleName
+, CASE WHEN LastName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'Not Documented') ELSE LastName END LastName 
 , CASE a.Sex WHEN 16 THEN 51 WHEN 17 THEN 52 ELSE NULL END AS Sex
 , 1 Active
 , 0 DeleteFlag
@@ -292,7 +292,7 @@ SELECT c.Id PatientId
 	WHEN d.Name LIKE '%OPD%' OR d.Name LIKE '%Out%patient%' THEN 18 --OPD
 	WHEN d.Name LIKE '%MCH%' OR d.Name LIKE '%PMTCT%' THEN 19 --MCH	
 	WHEN d.Name LIKE 'TB%' THEN 20 --TB
-	WHEN d.Name LIKE '%Inpatient%' OR d.Name LIKE '%IPD%' THEN 22 --MCH
+	WHEN d.Name LIKE '%Inpatient%' OR d.Name LIKE '%IPD%' THEN 22 --IPD
 	WHEN d.Name IS NULL THEN 0 --Not Documented
 	ELSE 25 --Other
 	END AS EntryPoint

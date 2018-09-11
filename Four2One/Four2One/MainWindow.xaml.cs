@@ -33,6 +33,7 @@ namespace Four2One
             InitializeComponent();    
             //GridLog.DataContext = Logs;
         }
+
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             //Logs.Add(new Log { LogID = 1, LogType = "TEST", LogMessage = "MESSAGE" });
@@ -42,11 +43,13 @@ namespace Four2One
             string password = txtPassword.Password;
             string iqcareDB = cBDatabase.Text;
 
+            connectionString = CreateConnectionString(server, username, password, iqcareDB);
+            county = CBCounty.Text;
+            MFLCode = txtMFLCode.Text.Trim();
+
             if (ValidateParameters())
             {
-                connectionString = CreateConnectionString(server, username, password, iqcareDB);
-                county = CBCounty.Text;
-                MFLCode = txtMFLCode.Text.Trim();
+                
                 imgSave.Source = faCheck;
 
                 string facilitName = GetFacilityName(connectionString);
@@ -54,11 +57,43 @@ namespace Four2One
                 btnGo.IsEnabled = true;
                 imgGo.Source = faCheck;
             }
+            else if (ValidateForTest())
+            {
+                string facilitName = GetFacilityName(connectionString);
+                imgIQCareDB.Source = faCheck;
+                BIQCareDB.BorderBrush = check;
+                btnSave.IsEnabled = true;
+                btnGo.IsEnabled = false;
+                imgTest.Source = faCheck;
+                btnTest.IsEnabled = true;
+                txtReady.Text = string.Format("Ready to Test {0} on {1}", facilitName, server);
+            }
             else
             {
                 imgSave.Source = icWarning;
             }
 
+        }
+
+        private bool ValidateForTest()
+        {
+            bool valid = true;
+            if (!(iqcareVersion.ToLower().Contains("kenya hmis")))
+            {
+                imgIQCareDB.Source = icWarning;
+                BIQCareDB.BorderBrush = warning;
+                valid = false;
+            }
+            else
+            {
+                imgIQCareDB.Source = faCheck;
+                BIQCareDB.BorderBrush = check;
+                imgCounty.Source = null;
+                BCounty.BorderBrush = check;
+                imgMFLCode.Source = null;
+                txtMFLCode.BorderBrush = check;
+            }
+            return valid;
         }
 
         private string GetFacilityName(string connectionString)
@@ -213,9 +248,15 @@ namespace Four2One
                 MessageBox.Show(ex.Message);
             }
         }
+
         private void cBDatabase_DropDownClosed(object sender, EventArgs e)
         {
             //MessageBox.Show(cBDatabase.Text);
+            btnTest.IsEnabled = false;
+            btnGo.IsEnabled = false;
+            imgTest.Source = icWarning;
+            imgGo.Source = icWarning;
+
             if (cBDatabase.Text.Trim() != string.Empty)
             {
                 iqcareVersion = GetIQCareVersion(CreateConnectionString(txtSQLServer.Text
@@ -225,6 +266,12 @@ namespace Four2One
                 {
                     imgIQCareDB.Source = faCheck;
                     BIQCareDB.BorderBrush = check;
+                }
+                else if (iqcareVersion.ToLower().Contains("kenya hmis"))
+                {
+                    imgIQCareDB.Source = faCheck;
+                    BIQCareDB.BorderBrush = check;
+                    btnSave.IsEnabled = true;
                 }
                 else
                 {
@@ -369,19 +416,66 @@ namespace Four2One
 
             try
             {
+                //CleanDB(conn);
                 BackupDB(connectionString);
                 DBPrep(conn);
+                ActivateCustomForms(conn);
+                ActivateSCM(conn);
                 MigrateData(conn, mFLCode, county);
-               
+                DoneTesting();
             }
             catch(Exception ex)
             {
                 LogException(ex, txtSystem, imgSystem);
             }
 
+            DoneTesting();
+
+        }
+
+        private void DoneTesting()
+        {
+            imgTest.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgTest, faCheck);
+            }));
+
+            txtDoneMigrating.Dispatcher.Invoke((Action)(() =>
+            {
+                txtDoneMigrating.Text = "Done. Please check log for any errors!";
+            }));
+
+            btnSave.Dispatcher.Invoke((Action)(() =>
+            {
+                btnSave.IsEnabled = true;
+            }));
+
+            btnTest.Dispatcher.Invoke((Action)(() =>
+            {
+                btnTest.IsEnabled = true;
+            }));
+        }
+
+        private void DoneMigrating()
+        {
             imgGo.Dispatcher.Invoke((Action)(() =>
             {
                 ImageBehavior.SetAnimatedSource(imgGo, faCheck);
+            }));
+
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, faCheck);
+            }));
+
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, faCheck);
+            }));
+
+            txtDoneMigrating.Dispatcher.Invoke((Action)(() =>
+            {
+                txtDoneMigrating.Text = "Done. Please check log for any errors!";
             }));
 
             btnGo.Dispatcher.Invoke((Action)(() =>
@@ -394,22 +488,718 @@ namespace Four2One
                 btnSave.IsEnabled = true;
             }));
 
+            btnTest.Dispatcher.Invoke((Action)(() =>
+            {
+                btnTest.IsEnabled = true;
+            }));
         }
 
-        private void MigrateData(ServerConnection conn, string theMFLCode, string theCounty)
+        private void ActivateCustomForms(ServerConnection conn)
         {
-            
-            /*MigrateTreatmentSupporters(conn);
-            //MigrateHisoryAndBaseline(conn);
-            MigrateEncounters(conn);
-            MigrateVitals(conn);
-            MigrateAppointments(conn);
-            MigratePharmacy(conn);
-            MigrateLabs(conn);
-            MigratePresentingComplaints(conn);
-            MigrateAdverseEvents(conn);
-            */
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Re-activating Custom Forms";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\ActivateDynamicForms\\Tables"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Table Edits for Custom Forms!");
 
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\ActivateDynamicForms\\Views"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("View Edits for Custom Forms!");
+
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\ActivateDynamicForms\\SPs"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("SP Edits for Custom Forms!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Re-activating Custom Forms Error");
+            }
+        }
+
+        private void ActivateSCM(ServerConnection conn)
+        {
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Re-activating SCM";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\ActivateSCM\\Tables"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Table Edits for SCM!");
+                
+
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\ActivateSCM\\Views"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("View Edits for SCM!");
+
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\ActivateSCM\\SPs"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("SP Edits for SCM!");
+                LogSuccess(txtSystem, imgSystem, "Reactivated SCM!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Re-activating SCM Error");
+            }
+        }
+        
+        private void CleanDB(ServerConnection conn)
+        {
+            //TODO
+        }
+               
+        private void RunTests(string connectionString)
+        {
+            ServerConnection conn = new ServerConnection() { ConnectionString = connectionString };
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\Testing"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            SqlDataAdapter theAdpt = new SqlDataAdapter(fs, conn.SqlConnectionObject);
+                            DataTable theDT = new DataTable();
+                            theDT.BeginLoadData();
+                            theAdpt.Fill(theDT);
+                            theDT.EndLoadData();
+                            LogTestOutput(theDT);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogException(ex, txtLog, imgTest, s);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Testing Error!");
+            }
+            finally
+            {
+                DoneTesting();
+            }
+        }
+        
+        #region DBPrep
+        private void DBPrep(ServerConnection conn)
+        {
+            try
+            {
+                UpdateTableStructure(conn);
+                UpdateViews(conn);
+                UpdateFunctions(conn);
+                UpdateSPs(conn);
+                UpdateData(conn);
+                Deploy1007(conn);
+                UpdateVersion(conn);
+                LogSuccess(txtSystem, imgSystem, "Updated System Objects!");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        
+        private void Deploy1007(ServerConnection conn)
+        {
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Updating v1.0.0.7";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+
+            //Tables
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Tables"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Tables!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Tables Error!");
+            }
+
+            //Views
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Views"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Views!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Views Error!");
+            }
+
+            //Functions
+
+            /*try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Functions"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Functions!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Functions Error!");
+            }*/
+
+            //SPs
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\SPs"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 SPs!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 SPs Error!");
+            }
+
+            //Triggers
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Triggers"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Triggers!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Triggers Error!");
+            }
+
+            //Data
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Data"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Data!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Data Error!");
+            }
+
+            //Indexes            
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Indexes"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("1007 Indexes!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "1007 Indexes Error!");
+            }
+        }
+
+        private void UpdateVersion(ServerConnection conn)
+        {
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Updating Version";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\Version"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Updated IQCare Version!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "IQCare Version Update");
+            }
+        }
+
+        private void UpdateSPs(ServerConnection conn)
+        {
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Updating Stored Procedures";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\SPs"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Updated Stored Procedures!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "SPs");
+            }
+        }
+
+        private void UpdateFunctions(ServerConnection conn)
+        {
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Updating Functions";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Functions"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Updated Functions!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Functions");
+            }
+        }
+
+        private void UpdateViews(ServerConnection conn)
+        {
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Updating Views";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Views\\PreView"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Pre-View Objects!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Pre-View Error!");
+            }
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Views"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Updated Views!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "View Error!");
+            }
+        }
+
+        private void UpdateData(ServerConnection conn)
+        {
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Updating System Data";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemData"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Updated System Data");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "System Data");
+            }
+        }
+
+        private void UpdateTableStructure(ServerConnection conn)
+        {
+            txtSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                txtSystem.Text = "Updating Table Structure";
+            }));
+            imgSystem.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
+            }));
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Tables\\NewTables"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("New Tables!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Table Structure");
+            }
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Tables\\TableEdits"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Table Edits!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Table Structure");
+            }
+
+            try
+            {
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Tables\\Labs"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+                LogInfo("Lab Tables!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Labs");
+            }
+        }
+
+        #endregion
+
+        #region MigrateData
+        private void MigrateData(ServerConnection conn, string theMFLCode, string theCounty)
+        {          
             try
             {
                 MigrateRegistrations(conn, theCounty, theMFLCode);
@@ -429,11 +1219,36 @@ namespace Four2One
                 MigrateTransferIn(conn);
                 MigrateHIVDiagnosisDates(conn);
                 MigrateClinicIDs(conn);
+                MigrateWHOStaging(conn);
                 LogSuccess(txtMigrateData, imgMigrateData, "Migrated Client Data :-)");
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        private void MigrateWHOStaging(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating WHO Staging";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\WHOStaging.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated WHO Staging!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
@@ -888,266 +1703,7 @@ namespace Four2One
                 LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
-
-        private void DBPrep(ServerConnection conn)
-        {
-            try
-            {
-                UpdateTableStructure(conn);
-                UpdateViews(conn);
-                UpdateFunctions(conn);
-                UpdateSPs(conn);
-                UpdateData(conn);
-
-                Deploy1007(conn);
-
-                UpdateVersion(conn);
-
-                LogSuccess(txtSystem, imgSystem, "Updated System Objects!");
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        private void Deploy1007(ServerConnection conn)
-        {
-            txtSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                txtSystem.Text = "Updating v1.0.0.7";
-            }));
-            imgSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
-            }));
-
-            //Tables
-
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Tables"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("1007 Tables!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "1007 Tables Error!");
-            }
-
-            //Views
-
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Views"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("1007 Views!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "1007 Views Error!");
-            }
-
-            //Functions
-
-            /*try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Functions"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("1007 Functions!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "1007 Functions Error!");
-            }*/
-
-            //SPs
-
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\SPs"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("1007 SPs!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "1007 SPs Error!");
-            }
-
-            //Triggers
-
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Triggers"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("1007 Triggers!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "1007 Triggers Error!");
-            }
-
-            //Data
-
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Data"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("1007 Data!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "1007 Data Error!");
-            }           
-
-            //Indexes            
-
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\1007\\Indexes"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("1007 Indexes!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "1007 Indexes Error!");
-            }
-        }
-
-        private void UpdateVersion(ServerConnection conn)
-        {
-            txtSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                txtSystem.Text = "Updating Version";
-            }));
-            imgSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
-            }));
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\Version"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("Updated IQCare Version!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "IQCare Version Update");
-            }
-        }
-
+             
         private void MigrateHisoryAndBaseline(ServerConnection conn)
         {
             txtMigrateData.Dispatcher.Invoke((Action)(() =>
@@ -1208,263 +1764,7 @@ namespace Four2One
                 LogException(ex, txtMigrateData, imgMigrateData, "pr_421_registration");
             }
         }
-
-        private void UpdateSPs(ServerConnection conn)
-        {
-            txtSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                txtSystem.Text = "Updating Stored Procedures";
-            }));
-            imgSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
-            }));
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\SPs"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("Updated Stored Procedures!");               
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "SPs");
-            }
-        }
-
-        private void UpdateFunctions(ServerConnection conn)
-        {
-            txtSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                txtSystem.Text = "Updating Functions";
-            }));
-            imgSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
-            }));
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Functions"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("Updated Functions!");                
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "Functions");
-            }
-        }
-
-        private void UpdateViews(ServerConnection conn)
-        {
-            txtSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                txtSystem.Text = "Updating Views";
-            }));
-            imgSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
-            }));
-
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Views\\PreView"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("Pre-View Objects!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "Pre-View Error!");
-            }
-            
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Views"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("Updated Views!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "View Error!");
-            }            
-        }
-
-        private void UpdateData(ServerConnection conn)
-        {
-            txtSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                txtSystem.Text = "Updating System Data";
-            }));
-            imgSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
-            }));
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemData"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("Updated System Data");                
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "System Data");
-            }
-        }
-
-        private void UpdateTableStructure(ServerConnection conn)
-        {
-            txtSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                txtSystem.Text = "Updating Table Structure";
-            }));
-            imgSystem.Dispatcher.Invoke((Action)(() =>
-            {
-                ImageBehavior.SetAnimatedSource(imgSystem, progressWheel);
-            }));
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Tables\\NewTables"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("New Tables!");                
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "Table Structure");
-            }
-
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Tables\\TableEdits"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("Table Edits!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "Table Structure");
-            }
-
-            try
-            {
-                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\SystemObjects\\Tables\\Labs"))
-                {
-                    if (File.Exists(s))
-                    {
-                        FileInfo f = new FileInfo(s);
-                        string fs = f.OpenText().ReadToEnd();
-                        try
-                        {
-                            conn.ExecuteNonQuery(fs);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ex;
-                        }
-                    }
-                }
-                LogInfo("Lab Tables!");
-            }
-            catch (Exception ex)
-            {
-                LogException(ex, txtSystem, imgSystem, "Labs");
-            }
-        }
-
+                
         private void MigrateTreatmentSupporters(ServerConnection conn)
         {
             txtMigrateData.Dispatcher.Invoke((Action)(() =>
@@ -1488,7 +1788,7 @@ namespace Four2One
                 LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
-
+        #endregion
         private void BackupDB(string v)
         {
             try
@@ -1617,6 +1917,17 @@ namespace Four2One
             }
         }
 
+        private void LogTestOutput(DataTable theDT)
+        {
+            
+            txtLog.Dispatcher.Invoke((Action)(() =>
+            {
+                txtLog.Text += $"\n DATA ELEMENT = {theDT.Rows[0]["DataElement"].ToString()}";
+                txtLog.Text += $"\n     TOTAL RECORDS = {theDT.Rows[0]["Total"].ToString()}";
+                txtLog.Text += $"\n     NOT MATCHED = {theDT.Rows[0]["DoesNotMatch"].ToString()}";               
+            }));
+        }
+
         private void txtPassword_LostFocus(object sender, RoutedEventArgs e)
         {
             try
@@ -1669,6 +1980,34 @@ namespace Four2One
                 imgExportLog.Source = icWarning;
             }
                
+        }
+
+        private void btnTest_Click(object sender, RoutedEventArgs e)
+        {
+            ImageBehavior.SetAnimatedSource(imgTest, progressWheel);
+            btnSave.IsEnabled = false;
+            btnGo.IsEnabled = false;
+            btnTest.IsEnabled = false;
+            txtLog.Text = string.Empty;
+
+            try
+            {
+
+                Thread t = new Thread(() => RunTests(connectionString));
+                t.SetApartmentState(ApartmentState.STA);
+                t.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                ImageBehavior.SetAnimatedSource(imgTest, icWarning);
+            }
+            finally
+            {
+                //btnSave.IsEnabled = true;
+                //btnGo.IsEnabled = true;                
+            }
+
         }
     }
 }

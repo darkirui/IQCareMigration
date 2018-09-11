@@ -30,7 +30,7 @@
     <PublisherName>Palladium Group</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>29</ApplicationRevision>
+    <ApplicationRevision>37</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -235,6 +235,9 @@
     <Content Include="Scripts\DBUpdate\1007\Data\114 ICF.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Scripts\DBUpdate\1007\SPs\getPatientVitals.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\DBUpdate\1007\SPs\PersonEmergencyContactInsert.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -344,6 +347,186 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\DBUpdate\1007\Indexes\01 LookupTables.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Admin_GetModuleName_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Admin_SaveNewUser_Constella.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Admin_selectFeature.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Admin_UpdateUser_Constella.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Clinical_GetCustomFormFieldLabel.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Clinical_GetInitialFollowupVisitInfo.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Clinical_GetPatientHistory.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Clinical_GetPatientRegistrationCustom.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Clinical_SavePatientResults.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Clinical_ValidateCustomForm_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\Pr_FormBuilder_FetchUpdateFormDetail_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_FormBuilder_GetPublishedModuleList.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_FormBuilder_SaveLnkFormFutures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\Pr_FormBuilder_SaveMstFeature_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\Pr_FormBuilder_SaveMstSection_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\Pr_ManageForm_GetFormDetail_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\pr_Pharmacy_GetPediatricDetails_Constella.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\SPs\Pr_PMTCT_GetCustomFields_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Tables\lnk_GroupFeatures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Tables\mst_Code.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Tables\mst_Control.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Tables\mst_Decode.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Tables\mst_Feature.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Tables\mst_VisitType.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Views\dtl_PatientLabResults.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Views\lnk_LabValue.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Views\lnk_Parameterresult.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Views\lnk_TestParameter.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Views\mst_LabTest.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Views\ord_PatientLabOrder.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateDynamicForms\Views\VW_ModuleIdentifiers.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_Clinical_DeletePatientForms_Constella.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_Clinical_SaveUpdate_IPTDetails.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_CreateLocalCache_AllMasters_constella.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_GetPharmacypriorPrescription_Web.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_Pharmacy_GetPharmacyPrescriptions.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_BINCard_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_GetDashBoardDetails.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_GetDrugBatchDetails.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_GetPharmacyOrderDetail_Web.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_GetPharmacyVitals.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_GetSelectedDrugDetails.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_GetStockSummary_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_SaveLockpatientForDispensing.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_SavePharmacyDispenseOrderDetail_Web.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_SavePharmacyDispenseOrder_Web.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_SavePharmacyMarkOrderFullyDispensed_Web.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_SavePharmacyPartialDispense_Web.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\pr_SCM_SaveUpdateHivTreatementPharmacyField_Futures.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\sp_getPatientPharmacyPrescription.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\SPs\sp_SaveUpdatePharmacyPrescription_GreenCard.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\Tables\01 ord_Visit.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\Tables\02 mst_ItemMaster.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\Tables\03 ord_PatientPharmacyOrder.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\Tables\04 dtl_PatientPharmacyOrder.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\Tables\05 mst_User.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\Tables\06 mst_Regimen.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\Views\VW_Drug.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\Views\VW_PatientPharmacy.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\DBUpdate\ActivateSCM\Views\VW_UserDesignationTransaction.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\DBUpdate\SystemData\Counties.sql">
@@ -529,7 +712,21 @@
     <Content Include="Scripts\Migration\Vitals.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\Migration\WHOStaging.sql" />
+    <Content Include="Scripts\Migration\WHOStaging.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Testing\EnrollmentDate.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Testing\PhysicalAddress.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Testing\Temperature.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Testing\Village.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PublishFile Include="Microsoft.SqlServer.SqlClrProvider">
@@ -552,6 +749,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Scripts\DBUpdate\1007\Functions\" />
+    <Folder Include="Scripts\DBUpdate\Clean\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

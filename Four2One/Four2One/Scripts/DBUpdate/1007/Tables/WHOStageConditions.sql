@@ -346,6 +346,28 @@ END
 
 go
 
+if not exists(select * from LookupItem where Name like 'PulmonaryTB'  )
+BEGIN
+	insert into LookupItem(Name,DisplayName,DeleteFlag)
+	values('PulmonaryTB','Pulmonary TB','0')
+END
+go
+if  exists(select * from LookupItem where Name like 'PulmonaryTB' )
+BEGIN
+	if not Exists (select * from LookupMasterItem  lmi 
+	inner join LookupMaster lm on lm.Id=lmi.LookupMasterId
+	inner join LookupItem lit on lit.Id=lmi.LookupItemId where 
+	lit.Name='PulmonaryTB'  and lm.Name='WHOStageIIIConditions')
+	BEGIN
+		insert into LookupMasterItem 
+		select lm.Id,lit.Id,lit.DisplayName,'1.00' as OrdRank from LookupMaster lm,LookupItem lit
+		where lm.Name='WHOStageIIIConditions' and lit.Name='PulmonaryTB' 
+	END
+END
+
+
+go
+/*
 
 if not exists(select * from LookupItem where Name like '%PulmonaryTBSmear+%'  )
 BEGIN
@@ -393,7 +415,7 @@ END
 
 go
 
-
+*/
 
 if not exists(select * from LookupItem where  name like 'Chronicdiarrhoeawasting'  )
 BEGIN
