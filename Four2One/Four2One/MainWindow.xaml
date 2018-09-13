@@ -27,13 +27,13 @@
             <StackPanel  Margin="10 10 10 10"
                          >
 
-                <TextBlock 
+                <TextBlock x:Name="lblConnectionParams" 
                 Text="Connection Parameters" 
                 FontSize="14"                 
                 FontWeight="SemiBold"
                 Foreground="#00BFA5"
                 TextDecorations="Underline"
-                HorizontalAlignment="Center"/>
+                HorizontalAlignment="Center" MouseLeftButtonDown="lblConnectionParams_MouseLeftButtonDown"/>
 
                 <TextBlock 
                 Text="Server*" 
@@ -190,8 +190,8 @@
                         >
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="9*"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="221.333"/>
+                            <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <ComboBox SelectedIndex="-1" 
                               BorderThickness="0" 
@@ -281,11 +281,11 @@
                 TextWrapping="Wrap"
                 Margin="0, 10, 0, 0"
                 Foreground="#00BFA5"/>
-                <Grid Margin="0,5,0,0">                   
+                <Grid Margin="0,5,0,0">
                     <TextBlock 
                             Grid.Column="0" 
                             Text=""        
-                            FontSize="16"
+                            FontSize="12"
                             Foreground="#00BFA5"
                             Name="txtDoneMigrating"                             
                             IsEnabled="False"                            
@@ -453,8 +453,7 @@
                             Content="Export Log"
                             Padding="4"
                             x:Name="BtnExportLog" 
-                            Click="BtnExportLog_Click"
-                            
+                            Click="BtnExportLog_Click"                            
                              />
                             <Image Grid.Column="1"
                            x:Name="imgExportLog"                           
@@ -469,7 +468,7 @@
                            TextWrapping="Wrap" 
                            FontWeight="SemiBold"
                            Foreground="#00BFA5"
-                           Margin="0,5,0,0"                        
+                           Margin="5,5,50,5" TextAlignment="Right"                        
                            >
                     </TextBlock>
                     <!--<DataGrid

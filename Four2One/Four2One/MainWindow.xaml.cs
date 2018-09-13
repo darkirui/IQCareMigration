@@ -416,21 +416,48 @@ namespace Four2One
 
             try
             {
-                //CleanDB(conn);
                 BackupDB(connectionString);
                 DBPrep(conn);
                 ActivateCustomForms(conn);
                 ActivateSCM(conn);
                 MigrateData(conn, mFLCode, county);
-                DoneTesting();
+                CreateTestingObjects(conn);
+                DoneMigrating();
             }
             catch(Exception ex)
             {
                 LogException(ex, txtSystem, imgSystem);
             }
 
-            DoneTesting();
+            DoneMigrating();
+        }
 
+        private void CreateTestingObjects(ServerConnection conn)
+        {
+            try
+            {   
+                foreach (string s in Directory.GetFiles("Scripts\\DBUpdate\\TestingObjects"))
+                {
+                    if (File.Exists(s))
+                    {
+                        FileInfo f = new FileInfo(s);
+                        string fs = f.OpenText().ReadToEnd();
+                        try
+                        {
+                            conn.ExecuteNonQuery(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogInfo(ex.Message);
+                        }
+                    }
+                }
+                LogInfo("Testing Objects Created!");                
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtSystem, imgSystem, "Error Creating Testing Objects!");
+            }
         }
 
         private void DoneTesting()
@@ -660,9 +687,9 @@ namespace Four2One
                         {
                             SqlDataAdapter theAdpt = new SqlDataAdapter(fs, conn.SqlConnectionObject);
                             DataTable theDT = new DataTable();
-                            theDT.BeginLoadData();
-                            theAdpt.Fill(theDT);
-                            theDT.EndLoadData();
+                                theDT.BeginLoadData();
+                                theAdpt.Fill(theDT);
+                                theDT.EndLoadData();
                             LogTestOutput(theDT);
                         }
                         catch (Exception ex)
@@ -1919,13 +1946,24 @@ namespace Four2One
 
         private void LogTestOutput(DataTable theDT)
         {
-            
-            txtLog.Dispatcher.Invoke((Action)(() =>
+            if(Convert.ToInt32(theDT.Rows[0]["DoesNotMatch"].ToString()) == 0)
             {
-                txtLog.Text += $"\n DATA ELEMENT = {theDT.Rows[0]["DataElement"].ToString()}";
-                txtLog.Text += $"\n     TOTAL RECORDS = {theDT.Rows[0]["Total"].ToString()}";
-                txtLog.Text += $"\n     NOT MATCHED = {theDT.Rows[0]["DoesNotMatch"].ToString()}";               
-            }));
+                txtLog.Dispatcher.Invoke((Action)(() =>
+                {
+                    txtLog.Text += $"\n DATA ELEMENT = {theDT.Rows[0]["DataElement"].ToString()} = OK";                    
+                }));
+            }
+            else
+            {
+                txtLog.Dispatcher.Invoke((Action)(() =>
+                {
+                    txtLog.Text += $"\n ";
+                    txtLog.Text += $"\n DATA ELEMENT = {theDT.Rows[0]["DataElement"].ToString()}";
+                    txtLog.Text += $"\n     TOTAL RECORDS = {theDT.Rows[0]["Total"].ToString()}";
+                    txtLog.Text += $"\n     NOT MATCHED = {theDT.Rows[0]["DoesNotMatch"].ToString()}";
+                    txtLog.Text += $"\n ";
+                }));
+            }
         }
 
         private void txtPassword_LostFocus(object sender, RoutedEventArgs e)
@@ -2008,6 +2046,18 @@ namespace Four2One
                 //btnGo.IsEnabled = true;                
             }
 
+        }
+
+        private void lblConnectionParams_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            txtSQLServer.Text = ".\\SQLSERVER";
+            txtUserName.Text = "sa";
+            txtPassword.Password = "c0nstella";
+
+            txtMFLCode.Text = "12345";
+            CBCounty.Text = "NAIROBI";
+            //cBDatabase.Text = "IQCareV1";
+            txtPassword_LostFocus(sender, e);
         }
     }
 }

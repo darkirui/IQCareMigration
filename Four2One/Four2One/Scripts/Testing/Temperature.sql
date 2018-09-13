@@ -1,19 +1,17 @@
-﻿/*Testing Temperature
-Get Patient
-VisitDate
-Temperature on that date
-Remove incorrect Temperature
-*/
-WITH V4Temp AS (
+﻿WITH V4Temp AS (
 select a.Ptn_pk
-, cast(b.VisitDate as date) VisitDate
-, c.Temp 
+, d.VisitDate
+, MAX(c.Temp) Temp 
 from IQCareV4.dbo.CCCPatientsBeingMigrated a 
-INNER JOIN ord_Visit b ON a.Ptn_pk = b.Ptn_Pk 
+INNER JOIN IQCareV4.dbo.ord_Visit b ON a.Ptn_pk = b.Ptn_Pk 
+INNER JOIN IQCareV4.dbo.CCCEncountersBeingMigrated d ON b.Ptn_Pk = d.Ptn_Pk and cast(b.VisitDate as date) = d.VisitDate
 INNER JOIN dtl_PatientVitals c ON b.Visit_Id = c.Visit_pk AND b.Ptn_pk = c.Ptn_Pk
 WHERE 
 c.Temp between 34 and 40 AND 
-(b.DeleteFlag = 0 or b.DeleteFlag is null))
+(b.DeleteFlag = 0 or b.DeleteFlag is null)
+
+GROUP BY a.Ptn_pk
+, d.VisitDate)
 
 , V1Temperature AS (
 SELECT c.ptn_pk

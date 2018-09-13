@@ -187,7 +187,11 @@ SELECT a.Ptn_Pk
 , 1 Active
 , a.DateOfBirth 
 , a.DobPrecision
-, ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'') NationalId
+, ENCRYPTBYKEY(KEY_GUID('Key_CTC')
+	,CASE WHEN [ID/PassportNo] = '' OR [ID/PassportNo] IS NULL 
+		THEN '' 
+	ELSE LTRIM(RTRIM([ID/PassportNo])) 
+	END)  NationalId
 , 0 DeleteFlag
 , a.CreatedBy
 , a.CreateDate
@@ -292,7 +296,10 @@ SELECT c.Id PatientId
 	WHEN d.Name LIKE '%OPD%' OR d.Name LIKE '%Out%patient%' THEN 18 --OPD
 	WHEN d.Name LIKE '%MCH%' OR d.Name LIKE '%PMTCT%' THEN 19 --MCH	
 	WHEN d.Name LIKE 'TB%' THEN 20 --TB
-	WHEN d.Name LIKE '%Inpatient%' OR d.Name LIKE '%IPD%' THEN 22 --IPD
+	WHEN (d.Name LIKE '%Inpatient%' OR d.Name LIKE '%IPD%')
+	AND CAST(DATEDIFF(dd, a.DateOfBirth, c.RegistrationDate)/365.25 as decimal(18,1)) >= 15 THEN 22 --IPD-Adult
+	WHEN (d.Name LIKE '%Inpatient%' OR d.Name LIKE '%IPD%') 
+	AND CAST(DATEDIFF(dd, a.DateOfBirth, c.RegistrationDate)/365.25 as decimal(18,1)) < 15 THEN 21 --IPD-Child
 	WHEN d.Name IS NULL THEN 0 --Not Documented
 	ELSE 25 --Other
 	END AS EntryPoint

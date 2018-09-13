@@ -19,7 +19,8 @@
 			WHEN a.PwPService IN ('On site screening for STIs/RTI') THEN 77 
 			WHEN a.PwPService IN ('AdC = Adherence counselling') THEN 72
 	ELSE NULL END AS PwP
-	FROM PwPServices a INNER JOIN ord_Visit b ON a.Visit_pk = b.Visit_Id
+	FROM PwPServices a INNER JOIN ord_Visit b ON a.Visit_pk = b.Visit_Id 
+	AND a.Ptn_Pk = b.Ptn_Pk
 	WHERE b.DeleteFlag = 0 OR b.DeleteFlag IS NULL)
 
 
