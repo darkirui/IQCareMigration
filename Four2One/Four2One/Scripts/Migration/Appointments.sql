@@ -1,6 +1,6 @@
 ﻿WITH ValidAppointments AS
 (Select a.Ptn_pk
-, b.VisitDate
+, CAST(b.VisitDate as DATE) VisitDate
 , MAX(a.AppDate) AppointmentDate
 
 FROM dtl_PatientAppointment a
@@ -11,7 +11,7 @@ AND a.AppDate IS NOT NULL
 AND YEAR(a.AppDate) BETWEEN 2000 And 2019
 AND a.AppDate >= b.VisitDate
 AND DATEDIFF(dd, b.VisitDate, a.AppDate) <= 365
-GROUP BY a.Ptn_pk, b.VisitDate)
+GROUP BY a.Ptn_pk, CAST(b.VisitDate as DATE))
 
 
 INSERT INTO PatientAppointment

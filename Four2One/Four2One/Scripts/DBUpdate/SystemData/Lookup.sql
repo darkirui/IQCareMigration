@@ -273,7 +273,7 @@ INSERT [dbo].[LookupItem] ([Id], [Name], [DisplayName], [DeleteFlag]) VALUES (10
 GO
 INSERT [dbo].[LookupItem] ([Id], [Name], [DisplayName], [DeleteFlag]) VALUES (103, N'Tier 4', N'National level', 0)
 GO
-INSERT [dbo].[LookupItem] ([Id], [Name], [DisplayName], [DeleteFlag]) VALUES (104, N'Yes', N'yes', 0)
+INSERT [dbo].[LookupItem] ([Id], [Name], [DisplayName], [DeleteFlag]) VALUES (104, N'Yes', N'Yes', 0)
 GO
 INSERT [dbo].[LookupItem] ([Id], [Name], [DisplayName], [DeleteFlag]) VALUES (105, N'No', N'No', 0)
 GO
