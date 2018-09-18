@@ -420,8 +420,8 @@ namespace Four2One
                 DBPrep(conn);
                 ActivateCustomForms(conn);
                 ActivateSCM(conn);
-                MigrateData(conn, mFLCode, county);
                 CreateTestingObjects(conn);
+                MigrateData(conn, mFLCode, county);                
                 DoneMigrating();
             }
             catch(Exception ex)
@@ -1239,6 +1239,7 @@ namespace Four2One
                 MigrateAdverseEvents(conn);
                 MigrateSMSConsent(conn);
                 MigrateICF(conn);
+                MigrateIPT(conn);
                 MigrateGeneralExamination(conn);
                 MigratePregnancyStatus(conn);
                 MigrateAdherenceAssessment(conn);
@@ -1253,6 +1254,30 @@ namespace Four2One
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        private void MigrateIPT(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating TB IPT";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\TBIPT.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated TB IPT!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 
