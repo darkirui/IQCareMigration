@@ -50,7 +50,7 @@
 			LEFT JOIN dtl_PatientARTEncounter k ON a.Visit_Id = k.Visit_Id AND a.Ptn_Pk = k.Ptn_Pk
 			Where 
 			(a.DeleteFlag = 0 OR a.DeleteFlag iS NULL)
-			AND a.VisitType NOT IN (0,4,5,6,12,18,19)
+			AND a.VisitType NOT IN (0,5,12,18,19)
 			AND b.VisitName NOT IN 
 			('Contact Tracking Form'
 			,'Councelling'

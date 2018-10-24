@@ -1,18 +1,33 @@
 ﻿IF NOT EXISTS(select Code from Identifiers where Code = N'PatientClinicId')
 BEGIN
-INSERT INTO Identifiers([Name],Code,DisplayName,DataType,IdentifierType,CreatedBy,CreateDate)
-VALUES
-(N'Patient Clinic ID',N'PatientClinicId',N'Clinic ID',N'Text',1,1,GETDATE());
+	INSERT INTO Identifiers([Name],Code,DisplayName,DataType,IdentifierType,CreatedBy,CreateDate)
+	VALUES
+	(N'Patient Clinic ID',N'PatientClinicId',N'Clinic ID',N'Numeric',1,1,GETDATE());
 
-insert into ServiceAreaIdentifiers
-(ServiceAreaId
-, IdentifierId
-, RequiredFlag)
-VALUES
-((select Id from ServiceArea WHERE Code = N'CCC')
-,(select Id from Identifiers Where Code = N'PatientClinicId')
-,0);
+
+	insert into ServiceAreaIdentifiers
+	(ServiceAreaId
+	, IdentifierId
+	, RequiredFlag)
+	VALUES
+	((select Id from ServiceArea WHERE Code = N'CCC')
+	,(select Id from Identifiers Where Code = N'PatientClinicId')
+	,0);
 END
+
+/*  UPDATE Identifiers SET DisplayName = 'Patient Clinic ID'
+, DataType = 'Text'
+, Code = 'PatientClinicId'
+, [Name] = 'Patient Clinic ID'
+WHERE Id = 6
+GO
+
+INSERT INTO ServiceAreaIdentifiers
+(ServiceAreaId, IdentifierId, RequiredFlag)
+VALUES
+(1, 6, 0)
+GO
+*/
 
 
 INSERT INTO PatientIdentifier(PatientId

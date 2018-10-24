@@ -1,5 +1,5 @@
 ﻿--Script to test migration of WHO stage
-WITH V4WHOStage as
+WITH _V4WHOStage as
 (select 
 a.Ptn_pk
 ,cast(c.VisitDate as date)VisitDate
@@ -14,6 +14,15 @@ inner join IQCareV4.dbo.dtl_PatientStage b on a.Ptn_pk=b.Ptn_pk
 inner join IQCareV4.dbo.ord_Visit c on b.Ptn_pk=c.Ptn_pk and b.Visit_Pk=c.Visit_Id
 inner join  IQCareV4.dbo.mst_Decode d on b.WHOStage=d.ID
 where (c.DeleteFlag =0 or c.DeleteFlag is null))
+
+, V4WHOStage AS
+(SELECT Ptn_pk
+, VisitDate
+, MAX(WHOStageV4) WHOStageV4 FROM _V4WHOStage
+GROUP BY  Ptn_pk
+, VisitDate)
+
+
 
 ,V1WHOStage as (select 
 a.PatientId
@@ -45,7 +54,9 @@ WHERE a.Ptn_pk=b.ptn_pk
   AND a.VisitDate=b.VisitDate)
 
 select 
-'WHOStage' DataElement
+'WHO Stage' DataElement
 ,count( Ptn_pk)Total
 ,Sum(DoesNotMatch)DoesNotMatch
 from linelist 
+
+

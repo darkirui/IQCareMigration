@@ -6,8 +6,8 @@ SET
 	VersionName='Ver 1.0.0.7 Kenya HMIS'
 GO
 
-UPDATE mst_Module SET Status = 1
-WHERE  ModuleName IN ('HIVCARE-STATICFORM')
+UPDATE mst_Module SET [Status] = 1
+WHERE  ModuleId IN (2,203)
 GO
 
 --UPDATE mst_Facility 

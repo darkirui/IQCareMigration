@@ -1,9 +1,4 @@
-﻿/*
-WHO Stage
-OIs
-*/
-
-WITH WHO AS (SELECT  
+﻿WITH WHO_ AS (SELECT  
 a.Ptn_Pk,
 a.Visit_Id VisitID,
 CAST(a.VisitDate as DATE) VisitDate
@@ -14,8 +9,17 @@ CAST(a.VisitDate as DATE) VisitDate
 	WHEN c.Name IN ('4','IV','T4') THEN 4
 ELSE NULL END AS WHOStage	
 FROM ord_Visit a
-INNER JOIN dtl_PatientStage b ON a.Visit_Id = b.Visit_Pk 
-INNER JOIN mst_Decode c ON b.WHOStage =c.Id)
+INNER JOIN dtl_PatientStage b ON a.Visit_Id = b.Visit_Pk AND a.Ptn_Pk = b.Ptn_pk
+INNER JOIN mst_Decode c ON b.WHOStage =c.Id
+INNER JOIN CCCEncountersBeingMigrated d ON a.Ptn_Pk = d.Ptn_pk and cast(a.VisitDate as date) = d.VisitDate
+INNER JOIN CCCPatientsBeingMigrated e ON a.Ptn_Pk = e.Ptn_pk
+)
+
+, WHO AS (
+SELECT Ptn_Pk
+, VisitDate
+, MAX(WHOStage) WHOStage FROM WHO_
+GROUP BY Ptn_Pk, VisitDate)
 
 INSERT INTO PatientWHOStage
 Select b.Id PatientId 

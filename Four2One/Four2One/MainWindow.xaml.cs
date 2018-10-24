@@ -1249,11 +1249,36 @@ namespace Four2One
                 MigrateClinicIDs(conn);
                 MigrateWHOStaging(conn);
                 MigrateNeoNatalHistory(conn);
+                MigrateCareEnding(conn);
                 LogSuccess(txtMigrateData, imgMigrateData, "Migrated Client Data :-)");
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+        }
+
+        private void MigrateCareEnding(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Care Ending";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\PatientCareEnding.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogInfo("Migrated Care Ending!");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
             }
         }
 

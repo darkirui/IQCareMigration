@@ -6649,3 +6649,23 @@ BEGIN
 ALTER TABLE [dbo].[LookupMaster] ADD  CONSTRAINT [DF_LookupMaster_DeleteFlag]  DEFAULT ((0)) FOR [DeleteFlag]
 END
 GO
+
+
+
+/*Additional Lookups*/
+
+
+IF NOT EXISTS(SELECT * FROM LookupItem WHERE [Name] = 'Married')
+BEGIN
+	INSERT INTO LookupItem (Name, DisplayName, DeleteFlag)
+	VALUES
+	('Married','Married', 0);
+
+	INSERT INTO LookupMasterItem(LookupMasterId, LookupItemId, OrdRank)
+	VALUES
+	(8
+	, (SELECT Id FROM LookupItem WHERE [Name] = 'Married')
+	,7);
+
+END
+GO

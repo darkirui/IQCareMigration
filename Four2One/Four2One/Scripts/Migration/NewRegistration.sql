@@ -22,9 +22,9 @@ INSERT INTO dbo.[Person]
 			, Ptn_Pk) 
 
 SELECT 
-CASE WHEN FirstName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'Not Documented') ELSE FirstName END FirstName
-,CASE WHEN MiddleName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'Not Documented') ELSE MiddleName END MiddleName
-, CASE WHEN LastName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'Not Documented') ELSE LastName END LastName 
+CASE WHEN FirstName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'') ELSE FirstName END FirstName
+,CASE WHEN MiddleName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'') ELSE MiddleName END MiddleName
+, CASE WHEN LastName IS NULL THEN ENCRYPTBYKEY(KEY_GUID('Key_CTC'),'') ELSE LastName END LastName 
 , CASE a.Sex WHEN 16 THEN 51 WHEN 17 THEN 52 ELSE NULL END AS Sex
 , 1 Active
 , 0 DeleteFlag
@@ -136,8 +136,8 @@ INSERT INTO [dbo].[PatientMaritalStatus]
 
 SELECT a.Id
 , CASE WHEN c.[Name] LIKE '%Polygamous%' THEN 60 --Married Polygamous
-WHEN c.[Name] LIKE '%Married%' THEN 57 --Married Monogamous
-WHEN c.[Name] LIKE '%Divorced%' THEN 62 --Married Monogamous
+WHEN c.[Name] LIKE '%Married%' THEN (select Id FROM LookupItem WHERE [Name] = 'Married') --Married
+WHEN c.[Name] LIKE '%Divorced%' THEN 62 
 WHEN c.[Name] LIKE '%Single%' THEN 58 --Single
 WHEN c.[Name] LIKE '%Cohabit%' THEN 59 --Cohabiting
 WHEN c.[Name] LIKE '%Widowed%' THEN 1437 --Cohabiting
@@ -266,14 +266,26 @@ SELECT c.Id PatientId
 , d.Id PatientEnrollmentId
 , 1
 , CAST(c.FacilityId as VARCHAR(1000)) 
-+ '-' 
+--+ '-' 
 + COALESCE(CAST(b.PatientEnrollmentID as VARCHAR(1000)), CAST(b.PatientClinicID as VARCHAR(1000))) IdentifierValue
 , 0
 , a.CreatedBy
 , a.CreateDate
 , 1
  from Person a INNER JOIN 
-mst_Patient b ON a.Ptn_Pk = b.Ptn_Pk 
+(select Ptn_Pk 
+, case
+ when ISNUMERIC(PatientEnrollmentId) = 1 and len(PatientEnrollmentId) = 1
+ then '0000' + PatientEnrollmentId
+when ISNUMERIC(PatientEnrollmentId) = 1 and len(PatientEnrollmentId) = 2
+then '000' + PatientEnrollmentId
+when ISNUMERIC(PatientEnrollmentId) = 1 and len(PatientEnrollmentId) = 3
+then '00' + PatientEnrollmentId
+when ISNUMERIC(PatientEnrollmentId) = 1 and len(PatientEnrollmentId) = 4
+then '0' + PatientEnrollmentId
+else PatientEnrollmentID end as PatientEnrollmentID
+, PatientClinicId
+from mst_Patient) b ON a.Ptn_Pk = b.Ptn_Pk 
 INNER JOIN Patient c ON a.Id = c.PersonId
 INNER JOIN PatientEnrollment d ON c.Id = d.PatientId
 LEFT JOIN PatientIdentifier e ON d.Id = e.PatientEnrollmentId
