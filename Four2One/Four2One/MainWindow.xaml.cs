@@ -1888,7 +1888,7 @@ namespace Four2One
                 FileInfo f = new FileInfo(s);
                 string fs = f.OpenText().ReadToEnd();
                 conn.ExecuteNonQuery(fs);
-                LogSuccess(txtMigrateData, imgMigrateData, "Migrating Alcohol and Drug Use,GBV,Disclosure,Depression screening");
+                LogSuccess(txtMigrateData, imgMigrateData, "Migrated Alcohol and Drug Use,GBV,Disclosure,Depression screening");
             }
             catch (Exception ex)
             {

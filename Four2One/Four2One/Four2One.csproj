@@ -646,8 +646,12 @@
     <Content Include="Scripts\Migration\Appointments.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\Migration\Disclosure.sql" />
-    <Content Include="Scripts\Migration\DrugHistory.sql" />
+    <Content Include="Scripts\Migration\Disclosure.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\DrugHistory.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\Migration\EncounterMaster.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -685,8 +689,12 @@
     <Content Include="Scripts\Migration\NewRegistration.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\Migration\NutritionalAssessment.sql" />
-    <Content Include="Scripts\Migration\PastMedicalHistory.sql" />
+    <Content Include="Scripts\Migration\NutritionalAssessment.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\PastMedicalHistory.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\Migration\PatientCareEnding.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -708,9 +716,15 @@
     <Content Include="Scripts\Migration\PresentingComplaints.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\Migration\pr_hamisha_regenrollments.sql" />
-    <Content Include="Scripts\Migration\Registration.sql" />
-    <Content Include="Scripts\Migration\Screening.sql" />
+    <Content Include="Scripts\Migration\pr_hamisha_regenrollments.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\Registration.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Scripts\Migration\Screening.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Scripts\Migration\SexualHistory.sql" />
     <Content Include="Scripts\Migration\SMSConsent.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
