@@ -19,7 +19,7 @@ INNER JOIN  IQCareV4.dbo.mst_Patient mp ON mp.Ptn_Pk=cc.Ptn_pk
 INNER JOIN IQCareV4.dbo.dtl_PatientClinicalStatus  dp  ON  cc.Ptn_Pk=cc.Ptn_Pk
 INNER JOIN IQCareV4.dbo.ord_Visit v 
 ON cc.Ptn_Pk = v.Ptn_Pk AND dp.Visit_Pk = v.Visit_Id
-WHERE mp.sex =17  
+WHERE mp.sex =17 and (v.DeleteFlag IS NULL OR v.DeleteFlag = 0)
 and dp.Pregnant is not null  
 )
 

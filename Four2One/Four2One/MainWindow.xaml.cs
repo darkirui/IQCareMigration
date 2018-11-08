@@ -372,6 +372,8 @@ namespace Four2One
 
             if (ApplicationDeployment.IsNetworkDeployed)
                 Title += " - v" + ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString();
+            else
+                Title += " - v1.0.0.50";
         }
 
         private void BtnGo_Click(object sender, RoutedEventArgs e)
@@ -1240,13 +1242,16 @@ namespace Four2One
                 MigrateSMSConsent(conn);
                 MigrateICF(conn);
                 MigrateIPT(conn);
+
                 MigrateGeneralExamination(conn);
                 MigratePregnancyStatus(conn);
                 MigrateAdherenceAssessment(conn);
                 MigratePHDPServices(conn);
                 MigrateTransferIn(conn);
+               
                 MigrateHIVDiagnosisDates(conn);
                 MigrateClinicIDs(conn);
+                MigrateScreening(conn);
                 MigrateWHOStaging(conn);
                 MigrateNeoNatalHistory(conn);
                 MigrateCareEnding(conn);
@@ -1865,6 +1870,31 @@ namespace Four2One
             {
                 LogException(ex, txtMigrateData, imgMigrateData, "pr_421_registration");
             }
+        }
+
+        private void MigrateScreening(ServerConnection conn)
+        {
+            txtMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                txtMigrateData.Text = "Migrating Alcohol and Drug Use,GBV,Disclosure,Depression screening";
+            }));
+            imgMigrateData.Dispatcher.Invoke((Action)(() =>
+            {
+                ImageBehavior.SetAnimatedSource(imgMigrateData, progressWheel);
+            }));
+            string s = "Scripts\\Migration\\Screening.sql";
+            try
+            {
+                FileInfo f = new FileInfo(s);
+                string fs = f.OpenText().ReadToEnd();
+                conn.ExecuteNonQuery(fs);
+                LogSuccess(txtMigrateData, imgMigrateData, "Migrating Alcohol and Drug Use,GBV,Disclosure,Depression screening");
+            }
+            catch (Exception ex)
+            {
+                LogException(ex, txtMigrateData, imgMigrateData, s);
+            }
+
         }
                 
         private void MigrateTreatmentSupporters(ServerConnection conn)

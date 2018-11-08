@@ -710,6 +710,7 @@
     </Content>
     <Content Include="Scripts\Migration\pr_hamisha_regenrollments.sql" />
     <Content Include="Scripts\Migration\Registration.sql" />
+    <Content Include="Scripts\Migration\Screening.sql" />
     <Content Include="Scripts\Migration\SexualHistory.sql" />
     <Content Include="Scripts\Migration\SMSConsent.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
